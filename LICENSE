@@ -19,11 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-The corpus in data/raw/ is Regulation (EU) 2024/1689, reproduced from the
-Official Journal of the European Union via the EU Publications Office
-(CELEX 32024R1689). Reuse of Commission documents is governed by Decision
-2011/833/EU. This project is not affiliated with or endorsed by the European
-Union, and nothing here is legal advice.
