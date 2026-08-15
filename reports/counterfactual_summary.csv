@@ -1,0 +1,5 @@
+subgraph,label,n,structure_agreement,label_agreement,citation_validity
+decoy,flipped,24,0.375,0.375,1.0
+decoy,true,24,0.375,0.042,1.0
+true,flipped,24,0.458,0.042,1.0
+true,true,24,0.542,0.542,1.0
