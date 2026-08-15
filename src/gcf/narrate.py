@@ -53,8 +53,18 @@ def _key() -> str:
     raise SystemExit("No GROQ_API_KEY. export it, or put it in ~/eu-ai-act-rag/.env")
 
 
+# Models that bill hidden reasoning against max_tokens need a large cap or they
+# return an empty string with no error -- the failure the sibling RAG project
+# documented. Naming the shape in an edge list needs no reasoning at all, so
+# this harness disables it where the model allows and keeps the cap small. That
+# matters for throughput, not elegance: at max_tokens=2000 the per-minute token
+# budget allowed ~4 calls and a 96-call run took over two hours.
+NO_REASONING = {"qwen/qwen3.6-27b"}
+
+
 def narrate(node: int, label: str, edges: str, timeout: float = 90.0,
-            max_retries: int = 6) -> str:
+            max_retries: int = 6, model: str | None = None,
+            max_tokens: int = 400) -> str:
     """One narration, with backoff on rate limits.
 
     Not defensive boilerplate: the first full run fired ~96 requests back to
@@ -63,13 +73,16 @@ def narrate(node: int, label: str, edges: str, timeout: float = 90.0,
     most of its samples and still prints a mean is a worse failure than one
     that crashes, because the output looks like a result.
     """
+    model = model or MODEL
     body = {
-        "model": MODEL,
+        "model": model,
         "temperature": 0.0,
-        "max_tokens": 2000,
+        "max_tokens": max_tokens,
         "messages": [{"role": "user",
                       "content": PROMPT.format(node=node, label=label, edges=edges)}],
     }
+    if model in NO_REASONING:
+        body["reasoning_effort"] = "none"
     delay = 2.0
     for attempt in range(max_retries):
         r = httpx.post(ENDPOINT, headers={"Authorization": f"Bearer {_key()}"},

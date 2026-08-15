@@ -38,7 +38,12 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.gcf import gnn, graphs, narrate  # noqa: E402
 
-N_NODES = 24          # nodes analysed; each costs 4 LLM calls
+N_NODES = 24          # nodes analysed; each costs 4 LLM calls per model
+# Two models, because a single one cannot separate "this pipeline
+# post-rationalises" from "this model cannot read an edge list". On a trivial
+# square-plus-triangle, qwen answers house and llama-3.3-70b answers cycle --
+# so structural reading ability is a variable here, not a constant.
+MODELS = ["qwen/qwen3.6-27b", "llama-3.3-70b-versatile"]
 K_EDGES = 8
 OUT = Path(__file__).resolve().parents[1] / "reports"
 CLASS_NAME = {1: "motif-A", 2: "motif-B"}   # deliberately uninformative names
@@ -109,13 +114,15 @@ def main() -> None:
             node_ids = {u for e in edges for u in e}
             for lab_kind in ("true", "flipped"):
                 lab_cls = cls if lab_kind == "true" else other
-                try:
-                    text = narrate.narrate(nd, CLASS_NAME[lab_cls], edge_str)
-                except Exception as e:
-                    failures.append(f"{nd}/{sub_kind}/{lab_kind}: {type(e).__name__}")
+                for mdl in MODELS:
+                  try:
+                    text = narrate.narrate(nd, CLASS_NAME[lab_cls], edge_str, model=mdl)
+                  except Exception as e:
+                    failures.append(f"{nd}/{sub_kind}/{lab_kind}/{mdl}: {type(e).__name__}")
                     continue
-                motif, cited = narrate.parse(text)
-                rows.append({
+                  motif, cited = narrate.parse(text)
+                  rows.append({
+                    "model": mdl,
                     "node": nd, "subgraph": sub_kind, "label": lab_kind,
                     "shape_shown": shown,
                     "motif_edges_recovered": recovered,
@@ -126,10 +133,10 @@ def main() -> None:
                         float(np.mean([c in node_ids for c in cited])) if cited else float("nan")
                     ),
                     "n_cited": len(cited),
-                })
+                  })
         print(f"  node {nd}: {len([r for r in rows if r['node'] == nd])}/4 conditions")
 
-    expected = len(chosen) * 4
+    expected = len(chosen) * 4 * len(MODELS)
     if failures:
         print(f"\n{len(failures)} of {expected} calls failed: {failures[:3]}")
     # Refuse to report a mean over a decimated sample. The first run produced a
@@ -145,7 +152,7 @@ def main() -> None:
     import pandas as pd
 
     df = pd.DataFrame(rows)
-    agg = df.groupby(["subgraph", "label"]).agg(
+    agg = df.groupby(["model", "subgraph", "label"]).agg(
         n=("node", "size"),
         structure_agreement=("agrees_with_structure", "mean"),
         label_agreement=("agrees_with_label", "mean"),

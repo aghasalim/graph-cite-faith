@@ -1,5 +1,9 @@
-subgraph,label,n,structure_agreement,label_agreement,citation_validity
-decoy,flipped,24,0.375,0.375,1.0
-decoy,true,24,0.375,0.042,1.0
-true,flipped,24,0.458,0.042,1.0
-true,true,24,0.542,0.542,1.0
+model,subgraph,label,n,structure_agreement,label_agreement,citation_validity
+llama-3.3-70b-versatile,decoy,flipped,24,0.917,0.917,1.0
+llama-3.3-70b-versatile,decoy,true,24,0.833,0.125,1.0
+llama-3.3-70b-versatile,true,flipped,24,0.5,0.5,1.0
+llama-3.3-70b-versatile,true,true,24,0.792,0.792,1.0
+qwen/qwen3.6-27b,decoy,flipped,24,0.292,0.292,1.0
+qwen/qwen3.6-27b,decoy,true,24,0.333,0.583,1.0
+qwen/qwen3.6-27b,true,flipped,24,0.542,0.208,1.0
+qwen/qwen3.6-27b,true,true,24,0.458,0.458,1.0
