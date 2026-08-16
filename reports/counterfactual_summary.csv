@@ -1,9 +1,25 @@
-model,subgraph,label,n,structure_agreement,label_agreement,citation_validity
-llama-3.3-70b-versatile,decoy,flipped,24,0.917,0.917,1.0
-llama-3.3-70b-versatile,decoy,true,24,0.833,0.125,1.0
-llama-3.3-70b-versatile,true,flipped,24,0.5,0.5,1.0
-llama-3.3-70b-versatile,true,true,24,0.792,0.792,1.0
-qwen/qwen3.6-27b,decoy,flipped,24,0.292,0.292,1.0
-qwen/qwen3.6-27b,decoy,true,24,0.333,0.583,1.0
-qwen/qwen3.6-27b,true,flipped,24,0.542,0.208,1.0
-qwen/qwen3.6-27b,true,true,24,0.458,0.458,1.0
+model,explainer,subgraph,label,n,structure_agreement,label_agreement,citation_validity
+llama-3.1-8b-instant,gnnexplainer,decoy,flipped,100,"0.450 [0.356,0.548]","0.450 [0.356,0.548]","1.000 [0.989,1.000]"
+llama-3.1-8b-instant,gnnexplainer,decoy,true,100,"0.450 [0.356,0.548]","0.550 [0.452,0.644]","1.000 [0.988,1.000]"
+llama-3.1-8b-instant,gnnexplainer,true,flipped,100,"0.550 [0.452,0.644]","0.450 [0.356,0.548]","1.000 [0.990,1.000]"
+llama-3.1-8b-instant,gnnexplainer,true,true,100,"0.550 [0.452,0.644]","0.550 [0.452,0.644]","1.000 [0.989,1.000]"
+llama-3.1-8b-instant,saliency,decoy,flipped,50,"0.460 [0.330,0.596]","0.460 [0.330,0.596]","1.000 [0.977,1.000]"
+llama-3.1-8b-instant,saliency,decoy,true,50,"0.460 [0.330,0.596]","0.540 [0.404,0.670]","1.000 [0.979,1.000]"
+llama-3.1-8b-instant,saliency,true,flipped,50,"0.540 [0.404,0.670]","0.460 [0.330,0.596]","1.000 [0.980,1.000]"
+llama-3.1-8b-instant,saliency,true,true,50,"0.540 [0.404,0.670]","0.540 [0.404,0.670]","1.000 [0.980,1.000]"
+llama-3.3-70b-versatile,gnnexplainer,decoy,flipped,46,"0.891 [0.770,0.953]","0.891 [0.770,0.953]","1.000 [0.981,1.000]"
+llama-3.3-70b-versatile,gnnexplainer,decoy,true,46,"0.500 [0.361,0.639]","0.500 [0.361,0.639]","1.000 [0.981,1.000]"
+llama-3.3-70b-versatile,gnnexplainer,true,flipped,46,"0.457 [0.322,0.598]","0.543 [0.402,0.678]","1.000 [0.976,1.000]"
+llama-3.3-70b-versatile,gnnexplainer,true,true,46,"0.783 [0.644,0.877]","0.783 [0.644,0.877]","1.000 [0.978,1.000]"
+openai/gpt-oss-120b,gnnexplainer,decoy,flipped,42,"0.738 [0.589,0.847]","0.738 [0.589,0.847]","1.000 [0.974,1.000]"
+openai/gpt-oss-120b,gnnexplainer,decoy,true,42,"0.619 [0.468,0.750]","0.048 [0.013,0.158]","1.000 [0.977,1.000]"
+openai/gpt-oss-120b,gnnexplainer,true,flipped,42,"0.738 [0.589,0.847]","0.048 [0.013,0.158]","1.000 [0.973,1.000]"
+openai/gpt-oss-120b,gnnexplainer,true,true,42,"0.738 [0.589,0.847]","0.738 [0.589,0.847]","1.000 [0.967,1.000]"
+openai/gpt-oss-20b,gnnexplainer,decoy,flipped,30,"0.833 [0.664,0.927]","0.833 [0.664,0.927]","1.000 [0.970,1.000]"
+openai/gpt-oss-20b,gnnexplainer,decoy,true,30,"0.833 [0.664,0.927]","0.000 [0.000,0.114]","1.000 [0.972,1.000]"
+openai/gpt-oss-20b,gnnexplainer,true,flipped,30,"0.767 [0.591,0.882]","0.100 [0.035,0.256]","1.000 [0.973,1.000]"
+openai/gpt-oss-20b,gnnexplainer,true,true,30,"0.833 [0.664,0.927]","0.833 [0.664,0.927]","1.000 [0.974,1.000]"
+qwen/qwen3.6-27b,gnnexplainer,decoy,flipped,51,"0.804 [0.675,0.890]","0.804 [0.675,0.890]","0.987 [0.963,0.996]"
+qwen/qwen3.6-27b,gnnexplainer,decoy,true,51,"0.686 [0.550,0.797]","0.118 [0.055,0.234]","0.996 [0.976,0.999]"
+qwen/qwen3.6-27b,gnnexplainer,true,flipped,51,"0.627 [0.490,0.747]","0.196 [0.110,0.325]","0.987 [0.962,0.996]"
+qwen/qwen3.6-27b,gnnexplainer,true,true,51,"0.569 [0.433,0.695]","0.569 [0.433,0.695]","0.996 [0.976,0.999]"

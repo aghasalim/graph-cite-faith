@@ -1,0 +1,7 @@
+model,explainer,n,edge_reading,follows_structure,follows_label,label_sensitivity,sens_n,unparsed
+llama-3.1-8b-instant,gnnexplainer,100,0.55,0.45,0.55,0.0,200,0.0
+llama-3.1-8b-instant,saliency,50,0.54,0.46,0.54,0.0,100,0.0
+llama-3.3-70b-versatile,gnnexplainer,46,0.5,0.5,0.5,0.391,92,0.0
+openai/gpt-oss-120b,gnnexplainer,42,0.833,0.619,0.048,0.238,84,0.0
+openai/gpt-oss-20b,gnnexplainer,30,0.9,0.833,0.0,0.217,60,0.008
+qwen/qwen3.6-27b,gnnexplainer,51,0.667,0.686,0.118,0.216,102,0.069

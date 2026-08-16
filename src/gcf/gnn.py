@@ -74,12 +74,40 @@ def explain_edges(m: GCN, x: torch.Tensor, a: torch.Tensor, node: int,
         return ((s + s.T) / 2)
 
 
-def top_edges(mask: torch.Tensor, candidates: list[int], k: int = 8
+def saliency_edges(m: GCN, x: torch.Tensor, a: torch.Tensor, node: int
+                   ) -> torch.Tensor:
+    """Gradient edge saliency: |d log p(target) / d a_uv| at the true graph.
+
+    A contrast to GNNExplainer that optimises nothing. GNNExplainer searches for
+    a sparse subgraph that *preserves* the prediction; saliency reports local
+    sensitivity of the prediction to each edge weight. They are different
+    questions and, empirically here, they surface different subgraphs -- which
+    is the point of running both.
+    """
+    aa = a.clone().detach().requires_grad_(True)
+    logits = m(x, aa)
+    target = int(logits[node].argmax())
+    F.log_softmax(logits[node], dim=-1)[target].backward()
+    g = aa.grad.abs()
+    return (g + g.T) / 2
+
+
+def top_edges(mask: torch.Tensor, g, candidates: list[int], k: int = 8
               ) -> list[tuple[int, int]]:
-    """The k highest-scoring edges among a candidate node set."""
-    scores = []
-    for i, u in enumerate(candidates):
-        for v in candidates[i + 1:]:
-            scores.append((float(mask[u, v]), u, v))
-    scores.sort(reverse=True)
-    return [(u, v) for _, u, v in scores[:k]]
+    """The k highest-scoring edges of `g` among a candidate node set.
+
+    Restricted to edges that actually exist. An earlier version ranked every
+    candidate *pair*: a GNNExplainer mask entry for a non-edge receives no
+    gradient (the GCN multiplies it by a zero adjacency entry) so it keeps its
+    random initialisation near 0.5, and saliency assigns non-edges a perfectly
+    real gradient. Phantom edges floated into the top-k -- 4 of 120 for
+    GNNExplainer, 85 of 120 for saliency. The LLM was being handed edges the
+    graph does not contain, which corrupts both the structure it is asked to
+    read and the citation-validity denominator.
+    """
+    cand = set(candidates)
+    scores = sorted(
+        (float(mask[u, v]), *sorted((u, v)))
+        for u, v in g.edges(candidates) if u in cand and v in cand
+    )
+    return [(u, v) for _, u, v in scores[::-1][:k]]
