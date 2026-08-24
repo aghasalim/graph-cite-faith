@@ -6,3 +6,6 @@ counterfactual:   ## the 2x2: does the narrative track the subgraph or the label
 	$(PY) -m experiments.counterfactual
 test:
 	$(PY) -m pytest tests/ -q
+
+figures:  ## redraw the README figures from reports/*.csv
+	$(PY) scripts/make_figures.py

@@ -19,7 +19,42 @@ are corrected below, with the instrument bugs that produced them.
 
 ---
 
-## The design
+
+---
+
+## Abstract
+
+When an LLM narrates a GNN explanation, does the text describe the subgraph it
+was handed, or paraphrase the label it was told? This work separates those by
+construction: narrations are elicited over subgraphs that are either the model's
+real explanation or a decoy, with a label that is either the model's prediction
+or its opposite, and the resulting text is scored for structure agreement and
+label agreement independently.
+
+The answer turns out to be a capability question before it is an explainability
+one. Across six narrator configurations, edge-reading accuracy ranges from 0.50 —
+chance — for Llama-3.1-8B to 0.90 for GPT-OSS-20B. The weakest narrators track the
+label they were given and ignore the graph entirely, with label sensitivity of
+exactly 0.000: their text does not change at all when the label is flipped, so it
+is neither reading the structure nor the label but producing boilerplate that
+agrees with the label about half the time.
+
+Citation validity is the cautionary result. It never drops below 0.987 and sits
+at exactly 1.000 in 20 of 24 cells, while structure agreement over the same
+narrations spans 0.450 to 0.891. A metric pinned near its ceiling regardless of
+whether the description is correct cannot be used as evidence of faithfulness,
+which is precisely how citation checks are often reported.
+
+**Contributions.** (i) A decoy-subgraph and flipped-label design that separates
+structure-following from label-following. (ii) A competence control showing
+whether a narrator can read the graph at all, which turns out to determine
+everything downstream. (iii) Evidence that citation validity is uninformative
+about narration faithfulness. (iv) Seven instrument bugs found and documented
+before any result was reported.
+
+---
+
+## 1. The design
 
 Synthetic graphs with planted `house` and `cycle` motifs, so the causally
 relevant subgraph for every node is known exactly. A GCN reaches 94.3% test
@@ -53,7 +88,18 @@ prompt reveals which shape belongs to which class.
 
 ---
 
-## Results
+## 2. Results
+
+![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
+
+![structure-following against label-following](reports/figures/structure-or-label.png)
+
+![how much the narration changes when only the label flips](reports/figures/label-sensitivity.png)
+
+Label sensitivity of exactly 0.000 is the sharpest number here. The 8B narrator's
+text does not change at all when the label is flipped, so it is not following the
+label either — it is producing boilerplate that happens to agree about half the
+time, which is what an apparent 0.55 label-following rate is actually made of.
 
 1,276 narrations plus 319 control probes. Every proportion carries a 95% Wilson
 interval; the intervals are the point, because several gaps the previous version
@@ -110,7 +156,9 @@ their intervals contain 0.5.
 
 ---
 
-## 1. Citation validity is near-perfect and still means almost nothing
+![citation validity against structure agreement](reports/figures/citation-validity.png)
+
+### 2.1 Citation validity is near-perfect and still means almost nothing
 
 Across 3,965 cited node ids from llama-3.1-8b, llama-3.3-70b, gpt-oss-20b and
 gpt-oss-120b, **every single one appeared in the edges the model was shown**.
@@ -128,7 +176,7 @@ One correction: citation validity is *not* 1.000 everywhere, as previously
 reported. qwen3.6-27b fabricated 8 node ids out of 919 (0.991 [0.983,0.996]),
 across 8 of its 204 narrations. Small, real, and only visible at this n.
 
-## 2. The competence-floor reading does not survive
+### 2.2 The competence-floor reading does not survive
 
 The previous version proposed that the label is what a model falls back on when
 it cannot read the evidence — post-rationalisation as a competence floor rather
@@ -167,7 +215,9 @@ predicts *nothing*; what the model does instead is a separate property.
 
 ![label sensitivity against edge-reading ability](reports/competence_vs_label.svg)
 
-## 3. What a conflicting label actually does to a competent reader
+![structure agreement across the decoy and flipped-label conditions](reports/figures/counterfactual.png)
+
+### 2.3 What a conflicting label actually does to a competent reader
 
 It does not flip them. It makes them hedge. Share of replies answering
 `neither`:
@@ -186,7 +236,7 @@ agreement falls to 0.767–0.833 once a label is in the prompt — the loss goes
 the prompt degrades a good reader's account of the evidence without persuading
 it.**
 
-## 4. The explainer contrast is inconclusive, and the reason is measurable
+### 2.4 The explainer contrast is inconclusive, and the reason is measurable
 
 Only llama-3.1-8b completed both explainer arms before the token budget ran out.
 Its numbers are indistinguishable: edge reading 0.550 [0.452,0.644] on
@@ -203,7 +253,7 @@ limitation of the arm, not a null result about explainers.
 
 ---
 
-## Seven instrument bugs, found before any result was reported
+## 3. Seven instrument bugs, found before any result was reported
 
 Each would have produced a confident, entirely fake number. Four were in the
 previous version; three are new, and two of those silently corrupted the
@@ -260,7 +310,7 @@ per-minute budget can possibly need.
 
 ---
 
-## Running it
+## 4. Running it
 
 ```bash
 make setup && make test
@@ -284,7 +334,7 @@ GCN and GNNExplainer are written against dense adjacency rather than
 torch-geometric: 740-node graphs make dense fast, and it removes the dependency
 most likely to stop this running on someone else's machine.
 
-## Limitations
+## 5. Limitations
 
 - **Unequal and small n for four of five models** — 30 to 51 nodes per cell
   against a planned 100, because the free tier's daily token budget ran out
@@ -306,6 +356,6 @@ most likely to stop this running on someone else's machine.
   the right answer for some extracted subgraphs. Nothing here distinguishes
   well-placed caution from noise.
 
-## License
+## 6. Licence
 
 MIT — see [LICENSE](LICENSE).
