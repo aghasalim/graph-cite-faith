@@ -1,4 +1,4 @@
-# GraphCiteFaith — perfect citations, wrong explanation
+# GraphCiteFaith, perfect citations, wrong explanation
 
 [![ci](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml/badge.svg)](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
@@ -6,7 +6,7 @@
 
 A GNN classifies a node, an explainer extracts the subgraph it used, and an LLM
 turns that into a sentence a human reads. This tests whether the sentence
-describes the subgraph it was handed — or the answer it was told. Built by a
+describes the subgraph it was handed, or the answer it was told. Built by a
 third-year Applied Computer Science (AI) student.
 
 **Headline: 3,965 of 3,965 cited node ids were real across four of five models,
@@ -32,8 +32,8 @@ or its opposite, and the resulting text is scored for structure agreement and
 label agreement independently.
 
 The answer turns out to be a capability question before it is an explainability
-one. Across six narrator configurations, edge-reading accuracy ranges from 0.50 —
-chance — for Llama-3.1-8B to 0.90 for GPT-OSS-20B. The weakest narrators track the
+one. Across six narrator configurations, edge-reading accuracy ranges from 0.50
+chance, for Llama-3.1-8B to 0.90 for GPT-OSS-20B. The weakest narrators track the
 label they were given and ignore the graph entirely, with label sensitivity of
 exactly 0.000: their text does not change at all when the label is flipped, so it
 is neither reading the structure nor the label but producing boilerplate that
@@ -56,9 +56,9 @@ before any result was reported.
 
 ## 1. The design
 
-Synthetic graphs with planted `house` and `cycle` motifs, so the causally
+Synthetic graphs with planted`house` and`cycle` motifs, so the causally
 relevant subgraph for every node is known exactly. A GCN reaches 94.3% test
-accuracy on structure alone — node features are pure noise, so it cannot be
+accuracy on structure alone, node features are pure noise, so it cannot be
 reading anything else.
 
 For each node, a 2×2:
@@ -69,7 +69,7 @@ For each node, a 2×2:
 | **decoy subgraph** | structure swapped | both swapped |
 
 The decoy is a *real* explanation subgraph from a randomly drawn node of the
-other motif class — a genuine alternative structure, not noise. The model is
+other motif class, a genuine alternative structure, not noise. The model is
 asked to commit to a motif name and a list of supporting node ids, both
 checkable against the edges it was given, so nothing is scored by a second LLM.
 A judge would reproduce the exact failure under study: one fluent model agreeing
@@ -83,7 +83,7 @@ Two things were added to the 2×2 for this run:
 - **A second explainer.** Gradient edge saliency alongside GNNExplainer, because
   the subgraph is an input to the narration.
 
-The class names shown to the model are `motif-A` / `motif-B`. Nothing in the
+The class names shown to the model are`motif-A` /`motif-B`. Nothing in the
 prompt reveals which shape belongs to which class.
 
 ---
@@ -98,7 +98,7 @@ prompt reveals which shape belongs to which class.
 
 Label sensitivity of exactly 0.000 is the sharpest number here. The 8B narrator's
 text does not change at all when the label is flipped, so it is not following the
-label either — it is producing boilerplate that happens to agree about half the
+label either, it is producing boilerplate that happens to agree about half the
 time, which is what an apparent 0.55 label-following rate is actually made of.
 
 1,276 narrations plus 319 control probes. Every proportion carries a 95% Wilson
@@ -106,8 +106,8 @@ interval; the intervals are the point, because several gaps the previous version
 reported do not survive them.
 
 Cells per model are unequal, and honestly so: Groq's free tier meters **tokens
-per day** — 100k for llama-3.3-70b, 200k for the rest — which at ~340–530 tokens
-a call buys about 290–500 calls per model per day. Only nodes where every
+per day**, 100k for llama-3.3-70b, 200k for the rest, which at ~340 to 530 tokens
+a call buys about 290 to 500 calls per model per day. Only nodes where every
 condition completed are analysed, so each model's four cells are balanced at
 whatever n it reached.
 
@@ -167,7 +167,7 @@ Zero fabrication. On the measure ported from
 up to 57% of citations were post-rationalised, this pipeline scores flawlessly.
 
 Meanwhile llama-3.3-70b names the correct shape 50.0% of the time with no label
-to lean on — chance, for a binary choice — while citing exclusively real nodes.
+to lean on, chance, for a binary choice, while citing exclusively real nodes.
 **A pipeline can pass a citation-faithfulness audit and hand an investigator a
 false account of the structure.** That is the finding, and more data strengthened
 it.
@@ -179,7 +179,7 @@ across 8 of its 204 narrations. Small, real, and only visible at this n.
 ### 2.2 The competence-floor reading does not survive
 
 The previous version proposed that the label is what a model falls back on when
-it cannot read the evidence — post-rationalisation as a competence floor rather
+it cannot read the evidence, post-rationalisation as a competence floor rather
 than deception. Measured directly, it fails.
 
 The measure it rested on was label agreement in the decisive cell. That measure
@@ -201,12 +201,12 @@ answer move?
 | llama-3.3-70b | 0.500 | 0.500 | **0.391 [0.298,0.493]** | 92 |
 
 Against edge-reading ability, the naive measure correlates at **r = −0.924**
-(exact permutation p = 0.058, n=5 models) — a textbook competence floor. The
+(exact permutation p = 0.058, n=5 models), a textbook competence floor. The
 within-node measure correlates at **r = +0.004** (p = 0.992). Nothing.
 
 The two models that cannot read the edge list behave in **opposite** ways.
-llama-3.1-8b never once changed its answer when the label changed — 0 of 200
-pairs — so its apparent 0.550 "label agreement" is an artefact of guessing, not
+llama-3.1-8b never once changed its answer when the label changed, 0 of 200
+pairs, so its apparent 0.550 "label agreement" is an artefact of guessing, not
 post-rationalisation. llama-3.3-70b, equally unable to read, is the most
 label-sensitive model in the set at 0.391.
 
@@ -224,15 +224,15 @@ It does not flip them. It makes them hedge. Share of replies answering
 
 | model | control (no label) | label present |
 |---|---|---|
-| gpt-oss-120b | 0.095 | 0.190 – 0.333 |
-| gpt-oss-20b | 0.000 | 0.133 – 0.167 |
-| qwen3.6-27b | 0.020 | 0.098 – 0.137 |
+| gpt-oss-120b | 0.095 | 0.190 to 0.333 |
+| gpt-oss-20b | 0.000 | 0.133 to 0.167 |
+| qwen3.6-27b | 0.020 | 0.098 to 0.137 |
 | llama-3.1-8b | 0.000 | 0.000 |
-| llama-3.3-70b | 0.000 | 0.000 – 0.022 |
+| llama-3.3-70b | 0.000 | 0.000 to 0.022 |
 
 gpt-oss-20b reads these subgraphs at 0.900 unprompted, and its structure
-agreement falls to 0.767–0.833 once a label is in the prompt — the loss goes to
-`neither`, not to the label (0.000–0.100). **Adding a possibly-wrong answer to
+agreement falls to 0.767 to 0.833 once a label is in the prompt, the loss goes to
+`neither`, not to the label (0.000 to 0.100). **Adding a possibly-wrong answer to
 the prompt degrades a good reader's account of the evidence without persuading
 it.**
 
@@ -246,7 +246,7 @@ sensitivity 0.000 on both.
 That is close to uninformative by construction. Once explanations are restricted
 to edges that actually exist (see the bugs below), the two explainers select
 **87% of the same edges**, and produce an identical top-8 for 10 of 50 nodes.
-Both recover the planted motif almost perfectly — 0.987 of its edges for
+Both recover the planted motif almost perfectly, 0.987 of its edges for
 GNNExplainer, 0.960 for saliency. On graphs this small there is barely a
 contrast to detect, and one model at chance cannot detect it. This is a
 limitation of the arm, not a null result about explainers.
@@ -264,12 +264,12 @@ to back hit Groq's per-minute cap; 91 failed and the harness printed a tidy
 summary table over **n=2**. It now backs off, checkpoints every reply, and
 *refuses to report* an arm built on fewer than 30 complete nodes.
 
-**Scoring exact-matched the string `cycle`.** 40 replies calling a six-node ring
+**Scoring exact-matched the string`cycle`.** 40 replies calling a six-node ring
 a "hexagon" were counted wrong. The answer set is now closed and defined in the
 prompt.
 
 **The ground-truth labeller was broken.** It inferred the shown shape from the
-extracted edges via "contains a triangle → house". Barabási–Albert
+extracted edges via "contains a triangle → house". Barabási, Albert
 neighbourhoods are full of incidental triangles, so it labelled **88 of 96**
 subgraphs "house". Ground truth now comes from planted-motif membership.
 
@@ -277,32 +277,31 @@ subgraphs "house". Ground truth now comes from planted-motif membership.
 construction order, so the first 60% contains zero cycle nodes and accuracy
 collapses to 9%. There is a test guarding this.
 
-**NEW — every decoy was the same two subgraphs.** The decoy was chosen as *the
+**NEW: every decoy was the same two subgraphs.** The decoy was chosen as *the
 first eligible node of the other class*, which is the same node every time. 96
 decoy narrations rested on **2 distinct stimuli**. That is what produced the
 published "llama-3.3-70b tracks structure, 0.833 against 0.125": it measured one
 model's reaction to one subgraph, replicated 48 times. With a decoy drawn
-per node, llama-3.3-70b sits at 0.500 [0.361,0.639] — chance, which its
+per node, llama-3.3-70b sits at 0.500 [0.361,0.639], chance, which its
 control accuracy of 0.500 predicts exactly. **The published claim was
 pseudo-replication.**
 
-**NEW — the explanations contained edges the graph does not have.** `top_edges`
+**NEW: the explanations contained edges the graph does not have.**`top_edges`
 ranked every candidate *pair*, not every edge. A GNNExplainer mask entry for a
-non-edge receives no gradient — the GCN multiplies it by a zero adjacency entry
-— so it keeps its random initialisation near 0.5 and floats into the top-k;
+non-edge receives no gradient, the GCN multiplies it by a zero adjacency entry, so it keeps its random initialisation near 0.5 and floats into the top-k;
 saliency assigns non-edges a perfectly real gradient. 4 of 120 GNNExplainer
 edges and **85 of 120 saliency edges** were fabrications by the harness, shown
 to the model as evidence and counted in the citation-validity denominator.
 
-**NEW — the parser blanked a third of three models' replies.** `MOTIF:\s*(\w+)`
-does not match `**MOTIF:** cycle`. In a live run it silently discarded 35–50% of
+**NEW: the parser blanked a third of three models' replies.**`MOTIF:\s*(\w+)`
+does not match`**MOTIF:** cycle`. In a live run it silently discarded 35 to 50% of
 gpt-oss-20b, gpt-oss-120b and qwen replies. A blank agrees with neither the
 structure nor the label, so those models would have been reported as evasive
 when the parser simply was not reading what they wrote. Parse failures are now
 0.9% and are reported as a rate, with raw replies kept in
 `reports/counterfactual.json` so the claim is checkable.
 
-A fourth new bug cost only time: the rate-limit pacer parsed Groq's `577ms`
+A fourth new bug cost only time: the rate-limit pacer parsed Groq's`577ms`
 reset header as **577 minutes** and put four of five worker threads to sleep for
 nine hours mid-run. Nothing raised; throughput just went to zero. The parser
 handles the millisecond form and no sleep may now exceed the 60 seconds a
@@ -317,7 +316,7 @@ make setup && make test
 ```
 
 18 tests, all on the generator, the split, the parser, the explainers and the
-interval maths — the instrument, not the model. Six of them encode bugs that
+interval maths, the instrument, not the model. Six of them encode bugs that
 actually shipped.
 
 ```bash
@@ -325,7 +324,7 @@ export GROQ_API_KEY=...   # or leave it in ~/eu-ai-act-rag/.env
 make counterfactual
 ```
 
-The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
+The run checkpoints to`reports/runs.jsonl` and resumes, because the free-tier
 daily token budget makes several sittings a certainty. Unparsed replies are
 retried rather than banked. Subgraphs are cached, so a restart skips the seven
 minutes of GNNExplainer optimisation.
@@ -336,7 +335,7 @@ most likely to stop this running on someone else's machine.
 
 ## 5. Limitations
 
-- **Unequal and small n for four of five models** — 30 to 51 nodes per cell
+- **Unequal and small n for four of five models**: 30 to 51 nodes per cell
   against a planned 100, because the free tier's daily token budget ran out
   mid-run. llama-3.1-8b reached the full 100. Every interval reflects its own n,
   and nothing below 30 complete nodes is reported at all. Rerunning across two
@@ -345,17 +344,17 @@ most likely to stop this running on someone else's machine.
   agree on 87% of edges anyway, so the question is barely tested.
 - **n=5 models** is too few for the correlation to carry weight either way. The
   competence-floor claim is refuted by the within-node measure showing no
-  relationship *and* by two same-ability models behaving oppositely — not by the
+  relationship *and* by two same-ability models behaving oppositely, not by the
   correlation coefficient.
 - **Synthetic graphs only.** Exact ground truth is the point, and a real
   citation network has no ground-truth "reason" to check against.
 - **Two motif classes**, so chance is 0.5 and the metric is coarse.
 - **One provider.** All five models are served by Groq; serving-stack effects
   are not separable from model effects.
-- **Not measured: whether the hedging in §3 is calibrated.** `neither` may be
+- **Not measured: whether the hedging in §3 is calibrated.**`neither` may be
   the right answer for some extracted subgraphs. Nothing here distinguishes
   well-placed caution from noise.
 
 ## 6. Licence
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
