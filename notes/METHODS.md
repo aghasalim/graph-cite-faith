@@ -277,11 +277,11 @@ most likely to stop this running on someone else's machine.
 ## 2. Results
 
 
-![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
+![can the narrator read the subgraph at all](../reports/figures/edge-reading.png)
 
-![structure-following against label-following](reports/figures/structure-or-label.png)
+![structure-following against label-following](../reports/figures/structure-or-label.png)
 
-![how much the narration changes when only the label flips](reports/figures/label-sensitivity.png)
+![how much the narration changes when only the label flips](../reports/figures/label-sensitivity.png)
 
 Label sensitivity of exactly 0.000 is the sharpest number here. The 8B narrator's
 text does not change at all when the label is flipped, so it is not following the
