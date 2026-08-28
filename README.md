@@ -184,7 +184,17 @@ predicts *nothing*; what the model does instead is a separate property.
 ![structure agreement across the decoy and flipped-label conditions](reports/figures/counterfactual.png)
 
 ### 2.3 What a conflicting label actually does to a competent reader
-Share of replies answering `neither`: | model | control (no label) | label present | |---|---|---| | gpt-oss-120b | 0.095 | 0.190 to 0.333 | | gpt-oss-20b | 0.000 | 0.133 to 0.167 | | qwen3.6-27b | 0.020 | 0.098 to 0.137 | | llama-3.1-8b | 0.000 | 0.000 | | llama-3.3-70b | 0.000 | 0.000 to 0.022 | gpt-oss-20b reads these subgraphs at 0.900 unprompted, and its structure agreement falls to 0.767 to 0.833 once a label is in the prompt, the loss goes to `neither`, not to the label (0.000 to 0.100).
+Share of replies answering `neither`:
+
+| model | control (no label) | label present |
+|---|---|---|
+| gpt-oss-120b | 0.095 | 0.190 to 0.333 |
+| gpt-oss-20b | 0.000 | 0.133 to 0.167 |
+| qwen3.6-27b | 0.020 | 0.098 to 0.137 |
+| llama-3.1-8b | 0.000 | 0.000 |
+| llama-3.3-70b | 0.000 | 0.000 to 0.022 |
+
+gpt-oss-20b reads these subgraphs at 0.900 unprompted, and its structure agreement falls to 0.767 to 0.833 once a label is in the prompt, the loss goes to `neither`, not to the label (0.000 to 0.100).
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#23-what-a-conflicting-label-actually-does-to-a-competent-reader).
 ### 2.4 The explainer contrast is inconclusive, and the reason is measurable
