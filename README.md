@@ -94,7 +94,8 @@ Label sensitivity of exactly 0.000 is the sharpest number here.
 ![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
 
 ![the control arm scored one probe at a time](reports/figures/edge-reading-accumulates.gif)
-*The same control probes scored one at a time in the order the replies landed: the running accuracy per model is what moves, the axes and the 0.5 chance line stay fixed, and each curve ends on the number it reports in the control table below.*
+
+*Control probes scored one at a time, in the order the replies landed. Each curve ends on the number it reports in the table below, so you can watch how long it takes to get there against the 0.5 chance line.*
 
 ![structure-following against label-following](reports/figures/structure-or-label.png)
 ![how much the narration changes when only the label flips](reports/figures/label-sensitivity.png)
@@ -178,7 +179,7 @@ label-sensitive model in the set at 0.391.
 Inability to read the evidence does not predict falling back on the label. It
 predicts *nothing*; what the model does instead is a separate property.
 
-![label sensitivity against edge-reading ability](reports/competence_vs_label.svg)
+![label sensitivity against edge-reading ability](reports/figures/competence-vs-label.png)
 
 ![structure agreement across the decoy and flipped-label conditions](reports/figures/counterfactual.png)
 
