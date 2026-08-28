@@ -417,56 +417,11 @@ def report(js: list[dict]) -> None:
     main.to_csv(OUT / "counterfactual_summary.csv")
     ctl.to_csv(OUT / "edge_reading_control.csv")
     joint.to_csv(OUT / "competence_vs_label.csv", index=False)
-    scatter(joint)
     for name, t in (("2x2 (proportion [95% Wilson CI])", main),
                     ("edge-reading control, no label in prompt", ctl),
                     ("decoy subgraph + true label vs control", joint)):
         print(f"\n=== {name} ===")
         print(t.to_string())
-
-
-def scatter(joint) -> None:
-    """Label use against edge-reading ability, as an SVG with no plotting
-    dependency. Six points; a library for that is more install surface than the
-    chart is worth.
-
-    Plots `label_sensitivity`, not `follows_label`. The competence-floor claim
-    this chart was built to test is only a claim if the y axis is free to vary
-    independently of the x axis, and `follows_label` is not.
-    """
-    def px(v, lo, hi):
-        return lo + v * (hi - lo)
-    pts, labs = [], []
-    for _, r in joint.iterrows():
-        cx, cy = px(r.edge_reading, 70, 450), px(1 - r.label_sensitivity, 40, 240)
-        fill = "#2563eb" if r.explainer == "gnnexplainer" else "#dc2626"
-        pts.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="5" fill="{fill}" '
-                   f'opacity="0.85"/>')
-        if r.explainer == "gnnexplainer":   # the saliency twin sits on top of it
-            labs.append(f'<text x="{cx + 8:.1f}" y="{cy - 8:.1f}" font-size="10" '
-                        f'fill="#444">{r.model.split("/")[-1]} (n={r.n})</text>')
-    grid = "".join(
-        f'<line x1="{px(t, 70, 450):.0f}" y1="30" x2="{px(t, 70, 450):.0f}" '
-        f'y2="250" stroke="#eee"/>'
-        f'<text x="{px(t, 70, 450):.0f}" y="266" font-size="9" fill="#888" '
-        f'text-anchor="middle">{t:.1f}</text>'
-        f'<line x1="60" y1="{px(t, 40, 240):.0f}" x2="460" '
-        f'y2="{px(t, 40, 240):.0f}" stroke="#eee"/>'
-        f'<text x="52" y="{px(t, 40, 240) + 3:.0f}" font-size="9" fill="#888" '
-        f'text-anchor="end">{1 - t:.1f}</text>'
-        for t in (0.0, 0.25, 0.5, 0.75, 1.0))
-    (OUT / "competence_vs_label.svg").write_text(
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" '
-        f'viewBox="0 0 560 300"><rect width="560" height="300" fill="white"/>'
-        f'{grid}<rect x="60" y="30" width="400" height="220" fill="none" '
-        f'stroke="#ccc"/>{"".join(pts)}{"".join(labs)}'
-        f'<text x="260" y="288" font-size="11" text-anchor="middle">'
-        f'edge-reading accuracy (control, no label in the prompt)</text>'
-        f'<text x="16" y="140" font-size="11" text-anchor="middle" '
-        f'transform="rotate(-90 16 140)">label sensitivity (answer moves with label)'
-        f'</text><text x="470" y="44" font-size="10" fill="#2563eb">'
-        f'GNNExplainer</text><text x="470" y="58" font-size="10" '
-        f'fill="#dc2626">saliency</text></svg>')
 
 
 def main() -> None:
