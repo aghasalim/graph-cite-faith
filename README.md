@@ -32,12 +32,12 @@ or its opposite, and the resulting text is scored for structure agreement and
 label agreement independently.
 
 The answer turns out to be a capability question before it is an explainability
-one. Across six narrator configurations, edge-reading accuracy ranges from 0.50
-chance, for Llama-3.1-8B to 0.90 for GPT-OSS-20B. The weakest narrators track the
-label they were given and ignore the graph entirely, with label sensitivity of
-exactly 0.000: their text does not change at all when the label is flipped, so it
-is neither reading the structure nor the label but producing boilerplate that
-agrees with the label about half the time.
+one. Across six narrator configurations, edge-reading accuracy ranges from 0.50,
+chance, for Llama-3.3-70B to 0.90 for GPT-OSS-20B. Llama-3.1-8B is no better: 0.55,
+with an interval that still contains 0.5. Its label sensitivity is exactly 0.000,
+over 200 flipped pairs the narration never changed when the label changed. It
+follows neither the structure nor the label. It produces boilerplate that agrees
+with the label about half the time.
 
 Citation validity is the cautionary result. It never drops below 0.987 and sits
 at exactly 1.000 in 20 of 24 cells, while structure agreement over the same
@@ -56,7 +56,7 @@ before any result was reported.
 
 ## 1. The design
 
-Synthetic graphs with planted`house` and`cycle` motifs, so the causally
+Synthetic graphs with planted `house` and `cycle` motifs, so the causally
 relevant subgraph for every node is known exactly. A GCN reaches 94.3% test
 accuracy on structure alone, node features are pure noise, so it cannot be
 reading anything else.
@@ -83,7 +83,7 @@ Two things were added to the 2×2 for this run:
 - **A second explainer.** Gradient edge saliency alongside GNNExplainer, because
   the subgraph is an input to the narration.
 
-The class names shown to the model are`motif-A` /`motif-B`. Nothing in the
+The class names shown to the model are `motif-A` /`motif-B`. Nothing in the
 prompt reveals which shape belongs to which class.
 
 ---
@@ -216,11 +216,15 @@ interval maths, the instrument, not the model. Six of them encode bugs that
 actually shipped.
 
 ```bash
-export GROQ_API_KEY=...   # or leave it in ~/eu-ai-act-rag/.env
+export GROQ_API_KEY=...
 make counterfactual
 ```
 
-The run checkpoints to`reports/runs.jsonl` and resumes, because the free-tier
+`src/gcf/narrate.py` also falls back to reading the key from a `.env` in my own
+`~/eu-ai-act-rag`. That is a leftover from another project on my machine, not a
+step you need. Exporting the variable is the whole setup.
+
+The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
 daily token budget makes several sittings a certainty. Unparsed replies are
 retried rather than banked. Subgraphs are cached, so a restart skips the seven
 minutes of GNNExplainer optimisation.

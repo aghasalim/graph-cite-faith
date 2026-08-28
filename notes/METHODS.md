@@ -16,12 +16,12 @@ or its opposite, and the resulting text is scored for structure agreement and
 label agreement independently.
 
 The answer turns out to be a capability question before it is an explainability
-one. Across six narrator configurations, edge-reading accuracy ranges from 0.50
-chance, for Llama-3.1-8B to 0.90 for GPT-OSS-20B. The weakest narrators track the
-label they were given and ignore the graph entirely, with label sensitivity of
-exactly 0.000: their text does not change at all when the label is flipped, so it
-is neither reading the structure nor the label but producing boilerplate that
-agrees with the label about half the time.
+one. Across six narrator configurations, edge-reading accuracy ranges from 0.50,
+chance, for Llama-3.3-70B to 0.90 for GPT-OSS-20B. Llama-3.1-8B is no better: 0.55,
+with an interval that still contains 0.5. Its label sensitivity is exactly 0.000,
+over 200 flipped pairs the narration never changed when the label changed. It
+follows neither the structure nor the label. It produces boilerplate that agrees
+with the label about half the time.
 
 Citation validity is the cautionary result. It never drops below 0.987 and sits
 at exactly 1.000 in 20 of 24 cells, while structure agreement over the same
@@ -40,7 +40,7 @@ before any result was reported.
 
 ## 1. The design
 
-Synthetic graphs with planted`house` and`cycle` motifs, so the causally
+Synthetic graphs with planted `house` and `cycle` motifs, so the causally
 relevant subgraph for every node is known exactly. A GCN reaches 94.3% test
 accuracy on structure alone, node features are pure noise, so it cannot be
 reading anything else.
@@ -67,7 +67,7 @@ Two things were added to the 2×2 for this run:
 - **A second explainer.** Gradient edge saliency alongside GNNExplainer, because
   the subgraph is an input to the narration.
 
-The class names shown to the model are`motif-A` /`motif-B`. Nothing in the
+The class names shown to the model are `motif-A` /`motif-B`. Nothing in the
 prompt reveals which shape belongs to which class.
 
 ---
@@ -193,7 +193,7 @@ to back hit Groq's per-minute cap; 91 failed and the harness printed a tidy
 summary table over **n=2**. It now backs off, checkpoints every reply, and
 *refuses to report* an arm built on fewer than 30 complete nodes.
 
-**Scoring exact-matched the string`cycle`.** 40 replies calling a six-node ring
+**Scoring exact-matched the string `cycle`.** 40 replies calling a six-node ring
 a "hexagon" were counted wrong. The answer set is now closed and defined in the
 prompt.
 
@@ -223,14 +223,14 @@ edges and **85 of 120 saliency edges** were fabrications by the harness, shown
 to the model as evidence and counted in the citation-validity denominator.
 
 **NEW: the parser blanked a third of three models' replies.**`MOTIF:\s*(\w+)`
-does not match`**MOTIF:** cycle`. In a live run it silently discarded 35 to 50% of
+does not match `**MOTIF:** cycle`. In a live run it silently discarded 35 to 50% of
 gpt-oss-20b, gpt-oss-120b and qwen replies. A blank agrees with neither the
 structure nor the label, so those models would have been reported as evasive
 when the parser simply was not reading what they wrote. Parse failures are now
 0.9% and are reported as a rate, with raw replies kept in
 `reports/counterfactual.json` so the claim is checkable.
 
-A fourth new bug cost only time: the rate-limit pacer parsed Groq's`577ms`
+A fourth new bug cost only time: the rate-limit pacer parsed Groq's `577ms`
 reset header as **577 minutes** and put four of five worker threads to sleep for
 nine hours mid-run. Nothing raised; throughput just went to zero. The parser
 handles the millisecond form and no sleep may now exceed the 60 seconds a
@@ -240,7 +240,7 @@ per-minute budget can possibly need.
 
 ## 4. Running it, implementation notes
 
-The run checkpoints to`reports/runs.jsonl` and resumes, because the free-tier
+The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
 daily token budget makes several sittings a certainty. Unparsed replies are
 retried rather than banked. Subgraphs are cached, so a restart skips the seven
 minutes of GNNExplainer optimisation.
