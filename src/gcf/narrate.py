@@ -13,7 +13,6 @@ from __future__ import annotations
 import os
 import re
 import time
-from pathlib import Path
 
 import httpx
 
@@ -59,14 +58,7 @@ MOTIF: <exactly one of: house, cycle, neither>
 def _key() -> str:
     if k := os.getenv("GROQ_API_KEY"):
         return k
-    # Fall back to the sibling project's .env so the harness runs without
-    # re-entering a key. Read, never echoed.
-    env = Path.home() / "eu-ai-act-rag" / ".env"
-    if env.exists():
-        for line in env.read_text().splitlines():
-            if line.startswith("GROQ_API_KEY="):
-                return line.split("=", 1)[1].strip().strip('"').strip("'")
-    raise SystemExit("No GROQ_API_KEY. export it, or put it in ~/eu-ai-act-rag/.env")
+    raise SystemExit("No GROQ_API_KEY. export it before running the narrator.")
 
 
 # Models that bill hidden reasoning against max_tokens need a large cap or they

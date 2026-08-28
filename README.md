@@ -220,10 +220,6 @@ export GROQ_API_KEY=...
 make counterfactual
 ```
 
-`src/gcf/narrate.py` also falls back to reading the key from a `.env` in my own
-`~/eu-ai-act-rag`. That is a leftover from another project on my machine, not a
-step you need. Exporting the variable is the whole setup.
-
 The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
 daily token budget makes several sittings a certainty. Unparsed replies are
 retried rather than banked. Subgraphs are cached, so a restart skips the seven
