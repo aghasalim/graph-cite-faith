@@ -92,6 +92,10 @@ prompt reveals which shape belongs to which class.
 Label sensitivity of exactly 0.000 is the sharpest number here.
 
 ![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
+
+![the control arm scored one probe at a time](reports/figures/edge-reading-accumulates.gif)
+*The same control probes scored one at a time in the order the replies landed: the running accuracy per model is what moves, the axes and the 0.5 chance line stay fixed, and each curve ends on the number it reports in the control table below.*
+
 ![structure-following against label-following](reports/figures/structure-or-label.png)
 ![how much the narration changes when only the label flips](reports/figures/label-sensitivity.png)
 
