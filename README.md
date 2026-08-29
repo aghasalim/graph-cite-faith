@@ -19,9 +19,6 @@ are corrected below, with the instrument bugs that produced them.
 
 ---
 
-
----
-
 ## Abstract
 
 When an LLM narrates a GNN explanation, does the text describe the subgraph it
@@ -89,7 +86,12 @@ prompt reveals which shape belongs to which class.
 ---
 
 ## 2. Results
-Label sensitivity of exactly 0.000 is the sharpest number here.
+Label sensitivity of exactly 0.000 is the sharpest number here. Over 200 flipped
+pairs llama-3.1-8b never changed its answer when the label changed, so it is not
+following the label either; it produces boilerplate that agrees with the label
+about half the time. The run behind these numbers is 1,276 narrations plus 319
+control probes, and every proportion carries a 95% Wilson interval, because
+several gaps the previous version reported do not survive them.
 
 ![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
 
@@ -102,7 +104,14 @@ Label sensitivity of exactly 0.000 is the sharpest number here.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#2-results).
 ### The 2×2, GNNExplainer
-| model | n/cell | subgraph | label | structure agr.
+
+Two of the four cells carry information, the ones where the structure and the
+label point at different answers. There gpt-oss-20b keeps describing the
+subgraph it was shown: 0.833 [0.664,0.927] structure agreement on a decoy
+against 0.000 [0.000,0.114] label agreement. llama-3.1-8b never leaves the
+0.450 to 0.550 band in any of the four cells. llama-3.3-70b scores 0.783 and
+0.891 where structure and label agree and 0.500 and 0.457 where they conflict,
+which is chance.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#the-22-gnnexplainer).
 ### The control: can the model read the edge list at all?
@@ -184,7 +193,8 @@ predicts *nothing*; what the model does instead is a separate property.
 ![structure agreement across the decoy and flipped-label conditions](reports/figures/counterfactual.png)
 
 ### 2.3 What a conflicting label actually does to a competent reader
-Share of replies answering `neither`:
+It does not flip them. It makes them hedge. Share of replies answering
+`neither`:
 
 | model | control (no label) | label present |
 |---|---|---|
@@ -198,11 +208,25 @@ gpt-oss-20b reads these subgraphs at 0.900 unprompted, and its structure agreeme
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#23-what-a-conflicting-label-actually-does-to-a-competent-reader).
 ### 2.4 The explainer contrast is inconclusive, and the reason is measurable
-Only llama-3.1-8b completed both explainer arms before the token budget ran out.
+Only llama-3.1-8b completed both explainer arms before the token budget ran out,
+and its two arms are indistinguishable: edge reading 0.550 [0.452,0.644] on
+GNNExplainer subgraphs against 0.540 [0.404,0.670] on saliency subgraphs, label
+sensitivity 0.000 on both. There is barely a contrast to detect. On the 50 nodes
+that arm covers the two explainers return the same edge set for 30 of them, and
+both recover nearly all of the planted motif, 0.987 of its edges for
+GNNExplainer and 0.960 for saliency. That is a limitation of the arm, not a null
+result about explainers.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#24-the-explainer-contrast-is-inconclusive-and-the-reason-is-measurable).
 ## 3. Seven instrument bugs, found before any result was reported
-Each would have produced a confident, entirely fake number.
+Each would have produced a confident, entirely fake number. The costly one: the
+decoy was always the first eligible node of the other class, so 96 decoy
+narrations rested on 2 distinct stimuli, and the published "llama-3.3-70b tracks
+structure at 0.833" was one model's reaction to one subgraph replicated 48
+times; drawn per node instead, that model sits at 0.500, chance. Two more of the
+seven: the harness showed the model edges the graph does not have, 85 of 120
+saliency edges, and a regex that could not match `**MOTIF:** cycle` silently
+discarded 35 to 50% of three models' replies. Parse failures are now 0.9%.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#3-seven-instrument-bugs-found-before-any-result-was-reported).
 ## 4. Running it
