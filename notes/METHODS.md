@@ -215,14 +215,14 @@ per node, llama-3.3-70b sits at 0.500 [0.361,0.639], chance, which its
 control accuracy of 0.500 predicts exactly. **The published claim was
 pseudo-replication.**
 
-**NEW: the explanations contained edges the graph does not have.**`top_edges`
+**NEW: the explanations contained edges the graph does not have.** `top_edges`
 ranked every candidate *pair*, not every edge. A GNNExplainer mask entry for a
 non-edge receives no gradient, the GCN multiplies it by a zero adjacency entry, so it keeps its random initialisation near 0.5 and floats into the top-k;
 saliency assigns non-edges a perfectly real gradient. 4 of 120 GNNExplainer
 edges and **85 of 120 saliency edges** were fabrications by the harness, shown
 to the model as evidence and counted in the citation-validity denominator.
 
-**NEW: the parser blanked a third of three models' replies.**`MOTIF:\s*(\w+)`
+**NEW: the parser blanked a third of three models' replies.** `MOTIF:\s*(\w+)`
 does not match `**MOTIF:** cycle`. In a live run it silently discarded 35 to 50% of
 gpt-oss-20b, gpt-oss-120b and qwen replies. A blank agrees with neither the
 structure nor the label, so those models would have been reported as evasive
@@ -269,7 +269,7 @@ most likely to stop this running on someone else's machine.
 - **Two motif classes**, so chance is 0.5 and the metric is coarse.
 - **One provider.** All five models are served by Groq; serving-stack effects
   are not separable from model effects.
-- **Not measured: whether the hedging in §3 is calibrated.**`neither` may be
+- **Not measured: whether the hedging in §3 is calibrated.** `neither` may be
   the right answer for some extracted subgraphs. Nothing here distinguishes
   well-placed caution from noise.
 

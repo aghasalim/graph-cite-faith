@@ -271,7 +271,7 @@ most likely to stop this running on someone else's machine.
 - **Two motif classes**, so chance is 0.5 and the metric is coarse.
 - **One provider.** All five models are served by Groq; serving-stack effects
   are not separable from model effects.
-- **Not measured: whether the hedging in §3 is calibrated.**`neither` may be
+- **Not measured: whether the hedging in §3 is calibrated.** `neither` may be
   the right answer for some extracted subgraphs. Nothing here distinguishes
   well-placed caution from noise.
 
