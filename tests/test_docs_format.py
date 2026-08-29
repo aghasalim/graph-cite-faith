@@ -27,9 +27,20 @@ def markdown_files() -> list[Path]:
 
 
 def prose_lines(path: Path):
-    """Yield (line number, text) outside fenced and indented code blocks."""
+    """Yield (line number, text) outside fenced code, indented code and front matter.
+
+    A Hugging Face Spaces card starts with a YAML block whose `emoji` field the
+    platform requires, so that block is not prose and is not checked.
+    """
     fenced = False
-    for n, line in enumerate(path.read_text(encoding="utf-8").split("\n"), 1):
+    lines = path.read_text(encoding="utf-8").split("\n")
+    start = 0
+    if lines and lines[0].strip() == "---":
+        for i in range(1, len(lines)):
+            if lines[i].strip() == "---":
+                start = i + 1
+                break
+    for n, line in enumerate(lines[start:], start + 1):
         if line.lstrip().startswith("```"):
             fenced = not fenced
             continue
@@ -57,9 +68,10 @@ def outside_code(line: str):
 @pytest.mark.parametrize("path", markdown_files(), ids=lambda p: str(p))
 def test_no_collapsed_tables(path: Path):
     """A table squeezed onto one line renders as literal pipes on GitHub."""
-    bad = [n for n, l in prose_lines(path)
-           if len(l) > 200 and "|" in l and "---" in l and not SEPARATOR.match(l.strip())]
-    assert not bad, f"{path.name}: table collapsed onto one line at {bad}"
+    bad = [n for n, text in prose_lines(path)
+           if len(text) > 200 and "|" in text and "---" in text
+           and not SEPARATOR.match(text.strip())]
+    assert not bad, f"{path.relative_to(ROOT)}: table collapsed onto one line at {bad}"
 
 
 @pytest.mark.parametrize("path", markdown_files(), ids=lambda p: str(p))
@@ -76,12 +88,12 @@ def test_code_spans_are_not_fused(path: Path):
             bad.append((n, "bullet"))
         if "**`" in line:
             bad.append((n, "bold"))
-    assert not bad, f"{path.name}: code span fused to what precedes it at {bad}"
+    assert not bad, f"{path.relative_to(ROOT)}: code span fused to what precedes it at {bad}"
 
 
 @pytest.mark.parametrize("path", markdown_files(), ids=lambda p: str(p))
 def test_plain_ascii_punctuation(path: Path):
     """No em dashes, en dashes or emoji. Maths symbols are fine."""
-    bad = [(n, c) for n, l in prose_lines(path)
-           for c in l if c in "—–" or EMOJI.match(c)]
-    assert not bad, f"{path.name}: non-plain punctuation at {bad[:5]}"
+    bad = [(n, c) for n, text in prose_lines(path)
+           for c in text if c in "—–" or EMOJI.match(c)]
+    assert not bad, f"{path.relative_to(ROOT)}: non-plain punctuation at {bad[:5]}"
