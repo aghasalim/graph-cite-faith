@@ -6,3 +6,7 @@ __pycache__/
 .env
 reports/runs.jsonl
 reports/stimuli.json
+
+# verify/ build products: the Rust crate's target tree and the compiled C
+verify/interval/target/
+verify/*.out

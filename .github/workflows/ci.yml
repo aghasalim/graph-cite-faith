@@ -17,3 +17,37 @@ jobs:
       # No API key in CI by design: every test covers the generator, the split
       # and the parser. The LLM calls are the experiment, not the contract.
       - run: python -m pytest tests/ -q
+
+  verify:
+    # Recompute the published numbers in eight other languages. Nothing here
+    # needs Python, torch or an API key: it all works from the files in
+    # reports/ that the run left behind.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # sqlite3, gcc, go, cargo, node, ruby and java are on the runner image
+      # already. R is not.
+      - name: install R if the runner does not have it
+        run: command -v Rscript || sudo apt-get install -y --no-install-recommends r-base-core
+      - name: every implementation agrees with the published numbers
+        run: ./verify/verify.sh
+
+      # A check that cannot fail is not a check. Corrupt one published interval
+      # and one per-narration record, and require the suite to reject both.
+      - name: the suite rejects a corrupted results file
+        run: |
+          set -e
+          perl -0pi -e 's/\Q0.783 [0.644,0.877]\E/0.783 [0.644,0.878]/' \
+            reports/counterfactual_summary.csv
+          if ./verify/verify.sh; then
+            echo "a moved interval bound was accepted"; exit 1
+          fi
+          git checkout -- reports/counterfactual_summary.csv
+          perl -0pi -e 's/"agrees_with_label":true/"agrees_with_label":false/' \
+            reports/counterfactual.json
+          if ./verify/verify.sh; then
+            echo "a flipped label agreement was accepted"; exit 1
+          fi
+          git checkout -- reports/counterfactual.json
+      - name: and passes again once the files are restored
+        run: ./verify/verify.sh
