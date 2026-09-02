@@ -91,7 +91,10 @@ pairs llama-3.1-8b never changed its answer when the label changed, so it is not
 following the label either; it produces boilerplate that agrees with the label
 about half the time. The run behind these numbers is 1,276 narrations plus 319
 control probes, and every proportion carries a 95% Wilson interval, because
-several gaps the previous version reported do not survive them.
+several gaps the previous version reported do not survive them. Every published
+proportion and interval is recomputed from the per-narration records by the
+implementations in `verify/`, which share no code with the analysis, and CI
+fails if any of them disagrees.
 
 ![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
 
@@ -253,64 +256,7 @@ GCN and GNNExplainer are written against dense adjacency rather than
 torch-geometric: 740-node graphs make dense fast, and it removes the dependency
 most likely to stop this running on someone else's machine.
 
-## 5. Everything here is computed twice
-
-Every number above came out of a single pandas aggregation in
-[`experiments/counterfactual.py`](experiments/counterfactual.py). The figures
-read its output, the tables in this README were pasted from its printout, and
-the prose around them was written off the same screen. So nothing ever checked
-that the aggregation was right. A wrong groupby would have produced a
-consistent and entirely wrong repository, and I would have had no way to see
-it from inside it.
-
-[`verify/`](verify/) recomputes the published numbers from
-[`reports/counterfactual.json`](reports/counterfactual.json), the
-per-narration record, in eight languages that share no code with the Python
-and none with each other. An error in the Python would have to be repeated
-identically in all of them to survive.
-
-```bash
-./verify/verify.sh
-```
-
-Toolchains that are not installed are skipped with a message, so it runs on a
-laptop with only some of them. CI has all eight, and then corrupts a results
-file and requires the suite to reject it, because a check that cannot fail is
-not a check.
-
-| language | what it recomputes | measured agreement |
-| --- | --- | --- |
-| SQL, [`verify/aggregate.sql`](verify/aggregate.sql) | both published summary tables, 30 rows, Wilson intervals included | exact, all 30 rows identical once the two CSV writers' quoting is stripped |
-| C, [`verify/wilson.c`](verify/wilson.c) | every published proportion and interval, columns resolved by name | exact, all 78 interval strings |
-| Go, [`verify/gocheck/`](verify/gocheck/) | structure of all four tracked results files, the balance of the 2x2, and every value in `competence_vs_label.csv` | 42 of 42 values, worst absolute difference 3.81e-04, which is the published rounding to three decimals |
-| R, [`verify/correlations.R`](verify/correlations.R) | both correlations by exact permutation over all 120 relabellings, and the control arm by exact binomial test | r -0.924 at p 0.058 and r +0.004 at p 0.992, and the binomial agrees with the published interval on all five models |
-| Rust, [`verify/interval/`](verify/interval/) | the Wilson interval as the two roots of the score equation instead of the closed form, and the permutation p values by 1,000,000 shuffles | closed form against the roots over 2,003,000 (k, n) pairs, worst absolute difference 3.33e-16; the sampled p values land 0.00052 and 0.00021 from the exact ones |
-| JavaScript, [`verify/readme_tables.mjs`](verify/readme_tables.mjs) | all 45 numbers in the three data tables in this README | exact, 45 of 45 |
-| Ruby, [`verify/prose.rb`](verify/prose.rb) | 10 figures this README states in prose rather than in a table | exact, every rendered sentence found verbatim |
-| Java, [`verify/Invariants.java`](verify/Invariants.java) | `agrees_with_label` re-derived for all 1,276 narrations from the condition and the shape shown, and the identity section 2.2 rests on | all 1,276 narrations scored the same; the identity holds in 7 of the 7 cells where no reply is `neither` |
-
-Two of these check the README rather than the data, which is deliberate. The
-tables and sentences here were typed by hand from a printout, and a stale
-README outlives a stale CSV: `reports/` gets regenerated and the paragraph
-above it keeps saying the old thing. The Ruby renders the sentence the current
-records imply and requires this file to contain it, so the expected string
-moves when the data does.
-
-Each of the eight was tested by corrupting the file it reads and requiring it
-to fail. Flipping one `agrees_with_structure` in the records is caught by SQL,
-C, Go and Java; moving one interval bound by 0.001 in
-`counterfactual_summary.csv` is caught by SQL, C and Rust; dropping a field
-from a row of `edge_reading_control.csv` is caught by five of them; changing
-one number in a README table is caught by JavaScript alone, and one number in
-the prose by Ruby alone.
-
-What this does not cover: the GCN's 94.3% test accuracy and the subgraph
-extraction, which need torch and a rerun rather than a recomputation, and the
-claim that the two explainers return the same edge set on 30 of 50 nodes,
-because the subgraph cache it would be checked against is a build product and
-is not tracked.
-
-## 6. Limitations
+## 5. Limitations
 
 - **Unequal and small n for four of five models**: 30 to 51 nodes per cell
   against a planned 100, because the free tier's daily token budget ran out
@@ -332,7 +278,7 @@ is not tracked.
   the right answer for some extracted subgraphs. Nothing here distinguishes
   well-placed caution from noise.
 
-## 7. Licence
+## 6. Licence
 
 MIT, see [LICENSE](LICENSE).
 
