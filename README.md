@@ -6,8 +6,7 @@
 
 A GNN classifies a node, an explainer extracts the subgraph it used, and an LLM
 turns that into a sentence a human reads. This tests whether the sentence
-describes the subgraph it was handed, or the answer it was told. Built by a
-third-year Applied Computer Science (AI) student.
+describes the subgraph it was handed, or the answer it was told.
 
 **Headline: 3,965 of 3,965 cited node ids were real across four of five models,
 while two of those models name the correct structure at chance.** Citation
@@ -280,12 +279,12 @@ most likely to stop this running on someone else's machine.
 
 ## 6. Licence
 
-MIT, see [LICENSE](LICENSE).
+Code here is MIT; the terms are in [LICENSE](LICENSE).
 
 ## References
 
-The papers and sources this implementation follows. Each one is here because
-the code uses the method, the dataset or the metric it describes.
+One paper per component: the explainer, the classifier it explains, and the
+definition of faithfulness the whole measurement is written against.
 
 - **Ying, Bourgeois, You, Zitnik, Leskovec. GNNExplainer: Generating Explanations for Graph Neural Networks. NeurIPS 2019.** [arXiv:1903.03894](https://arxiv.org/abs/1903.03894) the explanation the narration is checked against.
 - **Kipf, Welling. Semi-Supervised Classification with Graph Convolutional Networks. ICLR 2017.** [arXiv:1609.02907](https://arxiv.org/abs/1609.02907) the GCN being explained.
