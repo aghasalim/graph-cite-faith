@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: If you use this work, please cite it as below.
+title: "GraphCiteFaith, perfect citations, wrong explanation"
+abstract: "Does an LLM narrating a GNN explanation describe the subgraph it was given, or the answer it was told? Perfect citations, wrong explanations."
+type: software
+authors:
+  - family-names: Mustafazada
+    given-names: Aghasalim
+    orcid: "https://orcid.org/0009-0001-8746-4582"
+    affiliation: "Howest University of Applied Sciences"
+repository-code: "https://github.com/aghasalim/graph-cite-faith"
+url: "https://aghasalim.github.io/"
+license: MIT
+keywords:
+  - explainable ai
+  - graph neural networks
+  - hallucination detection
+  - llm evaluation
+  - machine learning
+  - pytorch
