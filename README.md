@@ -157,7 +157,7 @@ across 8 of its 204 narrations. Small, real, and only visible at this n.
 ### 2.2 The competence-floor reading does not survive
 
 The previous version proposed that the label is what a model falls back on when
-it cannot read the evidence, post-rationalisation as a competence floor instead of deception. Measured directly, it fails.
+it cannot read the evidence, post-rationalisation as a competence floor, not deception. Measured directly, it fails.
 
 The measure it rested on was label agreement in the decisive cell. That measure
 cannot support the claim, because **a model that never answers "neither" has
@@ -247,12 +247,10 @@ make counterfactual
 ```
 
 The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
-daily token budget makes several sittings a certainty. Unparsed replies are
-retried instead of banked. Subgraphs are cached, so a restart skips the seven
+daily token budget makes several sittings a certainty. Unparsed replies are retried, never banked. Subgraphs are cached, so a restart skips the seven
 minutes of GNNExplainer optimisation.
 
-GCN and GNNExplainer are written against dense adjacency instead of
-torch-geometric: 740-node graphs make dense fast, and it removes the dependency
+GCN and GNNExplainer are written against dense adjacency with no torch-geometric: 740-node graphs make dense fast, and it removes the dependency
 most likely to stop this running on someone else's machine.
 
 ## 5. Limitations
