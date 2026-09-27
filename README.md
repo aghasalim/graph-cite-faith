@@ -65,7 +65,7 @@ For each node, a 2×2:
 | **decoy subgraph** | structure swapped | both swapped |
 
 The decoy is a *real* explanation subgraph from a randomly drawn node of the
-other motif class, a genuine alternative structure, not noise. The model is
+other motif class, a genuine alternative structure. The model is
 asked to commit to a motif name and a list of supporting node ids, both
 checkable against the edges it was given, so nothing is scored by a second LLM.
 A judge would reproduce the exact failure under study: one fluent model agreeing
@@ -216,8 +216,7 @@ GNNExplainer subgraphs against 0.540 [0.404,0.670] on saliency subgraphs, label
 sensitivity 0.000 on both. There is barely a contrast to detect. On the 50 nodes
 that arm covers the two explainers return the same edge set for 30 of them, and
 both recover nearly all of the planted motif, 0.987 of its edges for
-GNNExplainer and 0.960 for saliency. That is a limitation of the arm, not a null
-result about explainers.
+GNNExplainer and 0.960 for saliency. That is a limitation of the arm.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#24-the-explainer-contrast-is-inconclusive-and-the-reason-is-measurable).
 ## 3. Seven instrument bugs, found before any result was reported
@@ -237,8 +236,7 @@ Full detail in [notes/METHODS.md](notes/METHODS.md#3-seven-instrument-bugs-found
 make setup && make test
 ```
 
-18 tests, all on the generator, the split, the parser, the explainers and the
-interval maths, the instrument, not the model. Six of them encode bugs that
+18 tests, all on the generator, the split, the parser, the explainers and the interval maths, the instrument. Six of them encode bugs that
 actually shipped.
 
 ```bash
@@ -264,8 +262,7 @@ most likely to stop this running on someone else's machine.
   agree on 87% of edges anyway, so the question is barely tested.
 - **n=5 models** is too few for the correlation to carry weight either way. The
   competence-floor claim is refuted by the within-node measure showing no
-  relationship *and* by two same-ability models behaving oppositely, not by the
-  correlation coefficient.
+  relationship *and* by two same-ability models behaving oppositely.
 - **Synthetic graphs only.** Exact ground truth is the point, and a real
   citation network has no ground-truth "reason" to check against.
 - **Two motif classes**, so chance is 0.5 and the metric is coarse.
