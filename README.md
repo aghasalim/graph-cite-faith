@@ -3,6 +3,7 @@
 [![ci](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml/badge.svg)](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23003633.svg)](https://doi.org/10.5281/zenodo.23003633)
 
 A GNN classifies a node, an explainer extracts the subgraph it used, and an LLM
 turns that into a sentence a human reads. This tests whether the sentence
