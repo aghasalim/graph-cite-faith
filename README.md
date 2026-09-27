@@ -8,12 +8,12 @@ A GNN classifies a node, an explainer extracts the subgraph it used, and an LLM
 turns that into a sentence a human reads. This tests whether the sentence
 describes the subgraph it was handed, or the answer it was told.
 
-**Headline: 3,965 of 3,965 cited node ids were real across four of five models,
-while two of those models name the correct structure at chance.** Citation
+Headline: 3,965 of 3,965 cited node ids were real across four of five models,
+while two of those models name the correct structure at chance. Citation
 validity and description accuracy are separate properties, and the standard
 attribution metric only tests the first.
 
-**This run overturns two claims the previous version of this README made.** Both
+This run overturns two claims the previous version of this README made. Both
 are corrected below, with the instrument bugs that produced them.
 
 ---
@@ -41,7 +41,7 @@ narrations spans 0.450 to 0.891. A metric pinned near its ceiling regardless of
 whether the description is correct cannot be used as evidence of faithfulness,
 which is precisely how citation checks are often reported.
 
-**Contributions.** (i) A decoy-subgraph and flipped-label design that separates
+Contributions. (i) A decoy-subgraph and flipped-label design that separates
 structure-following from label-following. (ii) A competence control showing
 whether a narrator can read the graph at all, which turns out to determine
 everything downstream. (iii) Evidence that citation validity is uninformative
@@ -73,11 +73,11 @@ with another.
 
 Two things were added to the 2×2 for this run:
 
-**A control.** The same subgraph, no predicted class in the prompt at all,
+A control. The same subgraph, no predicted class in the prompt at all,
 same closed answer set. "The model falls back on the label when it cannot read
 the evidence" is only a measurement once *cannot read* has a number.
 
-**A second explainer.** Gradient edge saliency alongside GNNExplainer, because
+A second explainer. Gradient edge saliency alongside GNNExplainer, because
 the subgraph is an input to the narration.
 
 The class names shown to the model are `motif-A` /`motif-B`. Nothing in the
@@ -157,8 +157,7 @@ across 8 of its 204 narrations. Small, real, and only visible at this n.
 ### 2.2 The competence-floor reading does not survive
 
 The previous version proposed that the label is what a model falls back on when
-it cannot read the evidence, post-rationalisation as a competence floor rather
-than deception. Measured directly, it fails.
+it cannot read the evidence, post-rationalisation as a competence floor instead of deception. Measured directly, it fails.
 
 The measure it rested on was label agreement in the decisive cell. That measure
 cannot support the claim, because **a model that never answers "neither" has
@@ -249,10 +248,10 @@ make counterfactual
 
 The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
 daily token budget makes several sittings a certainty. Unparsed replies are
-retried rather than banked. Subgraphs are cached, so a restart skips the seven
+retried instead of banked. Subgraphs are cached, so a restart skips the seven
 minutes of GNNExplainer optimisation.
 
-GCN and GNNExplainer are written against dense adjacency rather than
+GCN and GNNExplainer are written against dense adjacency instead of
 torch-geometric: 740-node graphs make dense fast, and it removes the dependency
 most likely to stop this running on someone else's machine.
 
