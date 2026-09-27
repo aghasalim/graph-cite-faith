@@ -73,11 +73,12 @@ with another.
 
 Two things were added to the 2×2 for this run:
 
-- **A control.** The same subgraph, no predicted class in the prompt at all,
-  same closed answer set. "The model falls back on the label when it cannot read
-  the evidence" is only a measurement once *cannot read* has a number.
-- **A second explainer.** Gradient edge saliency alongside GNNExplainer, because
-  the subgraph is an input to the narration.
+**A control.** The same subgraph, no predicted class in the prompt at all,
+same closed answer set. "The model falls back on the label when it cannot read
+the evidence" is only a measurement once *cannot read* has a number.
+
+**A second explainer.** Gradient edge saliency alongside GNNExplainer, because
+the subgraph is an input to the narration.
 
 The class names shown to the model are `motif-A` /`motif-B`. Nothing in the
 prompt reveals which shape belongs to which class.
