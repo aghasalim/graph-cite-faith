@@ -5,3 +5,4 @@ scikit-learn>=1.4
 pandas>=2.2
 httpx>=0.27
 matplotlib>=3.7
+pytest>=8
