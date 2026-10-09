@@ -66,6 +66,13 @@ def test_parse_extracts_both_commitments():
     assert motif == "house" and nodes == [3, 4, 5]
 
 
+def test_parse_takes_the_last_commitment():
+    """The prompt asks for MOTIF/NODES at the end; an earlier mention is reasoning."""
+    reply = ("At first glance MOTIF: cycle with NODES: 1, 2 looked right, but the "
+             "roof edge makes it a house.\nMOTIF: house\nNODES: 3, 4, 5")
+    assert narrate.parse(reply) == ("house", [3, 4, 5])
+
+
 def test_parse_survives_a_missing_block():
     """An empty reply must not silently score as a valid answer."""
     motif, nodes = narrate.parse("no structured tail here")
