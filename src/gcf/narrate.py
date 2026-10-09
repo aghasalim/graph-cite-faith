@@ -173,10 +173,13 @@ def parse(text: str) -> tuple[str, list[int]]:
     it stays unparsed and is reported as such rather than scored -- the point of
     closing the set was to stop free-form text being silently marked wrong.
     """
+    # The prompt asks for the commitment on the last lines, so the last match
+    # wins: a reply that says "MOTIF: cycle" while reasoning and then ends on
+    # "MOTIF: house" has committed to house.
     motif = ""
-    if m := re.search(rf"MOTIF\W{{0,4}}({'|'.join(ANSWERS)})\b", text, re.I):
-        motif = m.group(1).lower()
+    if ms := re.findall(rf"MOTIF\W{{0,4}}({'|'.join(ANSWERS)})\b", text, re.I):
+        motif = ms[-1].lower()
     nodes: list[int] = []
-    if m := re.search(r"NODES\W{0,4}([0-9][0-9,\s]*)", text, re.I):
-        nodes = [int(t) for t in re.findall(r"\d+", m.group(1))]
+    if ms := re.findall(r"NODES\W{0,4}([0-9][0-9,\s]*)", text, re.I):
+        nodes = [int(t) for t in re.findall(r"\d+", ms[-1])]
     return motif, nodes
