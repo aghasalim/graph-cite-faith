@@ -37,7 +37,7 @@ narration never changed when the label changed. So it follows neither the
 structure nor the label. It writes boilerplate that agrees with the label about
 half the time.
 
-Citation validity is the warning sign. It never drops below 0.987 and sits at
+Citation validity is the warning sign. It never drops below 0.941 and sits at
 exactly 1.000 in 20 of 24 cells. Meanwhile, structure agreement over the same
 narrations spans 0.450 to 0.891. A metric that stays near its ceiling whether
 or not the description is right can't count as evidence of faithfulness. That's
@@ -155,9 +155,14 @@ investigator a false account of the structure. That's the main finding, and the
 extra data made it stronger.
 
 I need to correct one thing. Citation validity is *not* 1.000 everywhere, as I
-reported before. qwen3.6-27b fabricated 8 node ids out of 919 (0.991 [0.983,0.996]),
-across 8 of its 204 narrations. It's small, but it's real, and it only shows up
-at this n.
+reported before. qwen3.6-27b fabricated 8 node ids out of 919, across 8 of its
+204 narrations (0.960 [0.924,0.980] cited only real ids). It's small, but it's
+real, and it only shows up at this n.
+
+I score citation validity per reply, as the share of replies that cited only
+real ids, and the intervals are over replies. I used to pool the cited ids and
+put the interval on those, but the ids in one reply come out of one generation
+and aren't independent, so that interval was too narrow.
 
 ### 2.2 The competence-floor reading does not survive
 

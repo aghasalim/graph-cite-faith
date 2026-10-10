@@ -234,8 +234,8 @@ def counterfactual(out: Path) -> Path:
 def citation_validity(out: Path) -> Path:
     """Every narrator cites validly, including the ones describing the wrong graph.
 
-    Citation validity checks that a cited node exists in the subgraph handed over.
-    It never falls below 0.987, while structure agreement over the same narrations
+    Citation validity is the share of replies whose cited nodes all exist in the
+    subgraph handed over. It never falls below 0.941, while structure agreement over the same narrations
     ranges from 0.450 to 0.891. Both axes are drawn on the same scale, so the flat
     band at the top is not an artefact of zooming in on it.
     """
@@ -254,10 +254,10 @@ def citation_validity(out: Path) -> Path:
     ax.axvline(0.5, color=CHANCE, lw=1.2, ls="--", zorder=1)
     ax.text(0.5, 0.425, " chance", fontsize=9.5, color=CHANCE, ha="left")
     ax.set_xlabel("structure agreement (fraction naming the right shape)")
-    ax.set_ylabel("citation validity\n(fraction of cited ids that exist)")
+    ax.set_ylabel("citation validity\n(fraction of replies citing only real ids)")
     ax.set_xlim(0.4, 1.02)
     ax.set_ylim(0.4, 1.03)
-    ax.text(1.01, 0.94, "lowest cell is 0.987: qwen3.6-27b invented 8 ids out of 919",
+    ax.text(1.01, 0.94, "lowest cell is 0.941: qwen3.6-27b invented ids in 3 of 51 replies",
             fontsize=8.5, color="#5a5a5a", ha="right", va="top")
     ax.legend(loc="lower right", ncol=3)
     titled(ax, "Citation validity sits at the ceiling whether the description is right or not",

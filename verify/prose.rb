@@ -95,15 +95,20 @@ unless dirty.empty?
   n_valid = rs.sum { |r| r['cited_valid'] }
   bad_narrations = rs.count { |r| r['n_cited'] > r['cited_valid'] }
   short = dirty.first.split('/').last
+  citing = rs.count { |r| r['n_cited'] > 0 }
   add(results, 'the fabricating model',
-      "#{short} fabricated #{n_cited - n_valid} node ids out of #{n_cited} " \
-      "(#{wilson(n_valid, n_cited)}), across #{bad_narrations} of its #{rs.size} narrations")
+      "#{short} fabricated #{n_cited - n_valid} node ids out of #{n_cited}, " \
+      "across #{bad_narrations} of its #{rs.size} narrations " \
+      "(#{wilson(citing - bad_narrations, citing)} cited only real ids)")
 end
 
 # The contrast the paper is built on: citation validity pinned at its ceiling
 # while structure agreement swings across half its range.
 cells = narrations.group_by { |r| [r['model'], r['explainer'], r['subgraph'], r['label']] }
-validity = cells.values.map { |rs| wilson(rs.sum { |r| r['cited_valid'] }, rs.sum { |r| r['n_cited'] }) }
+validity = cells.values.map do |rs|
+  citing = rs.select { |r| r['n_cited'] > 0 }
+  wilson(citing.count { |r| r['cited_valid'] == r['n_cited'] }, citing.size)
+end
 structure = cells.values.map { |rs| rs.count { |r| r['agrees_with_structure'] }.to_f / rs.size }
 add(results, 'citation validity floor and ceiling',
     format('It never drops below %.3f and sits at exactly 1.000 in %d of %d cells',

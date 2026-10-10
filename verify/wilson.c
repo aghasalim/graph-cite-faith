@@ -131,8 +131,9 @@ static long read_records(const char *path)
             c->n++;
             c->ks += agr_struct;
             c->kl += agr_label;
-            c->cv += cited_valid;
-            c->ct += n_cited;
+            /* citation validity is per reply: did it cite only real ids */
+            c->cv += n_cited > 0 && cited_valid == n_cited;
+            c->ct += n_cited > 0;
             records++;
             continue;
         }
