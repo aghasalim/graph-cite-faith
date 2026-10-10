@@ -5,97 +5,99 @@
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23003633.svg)](https://doi.org/10.5281/zenodo.23003633)
 
-A GNN classifies a node, an explainer extracts the subgraph it used, and an LLM
-turns that into a sentence a human reads. This tests whether the sentence
-describes the subgraph it was handed, or the answer it was told.
+A GNN classifies a node. An explainer pulls out the subgraph it used, and an LLM
+turns that into a sentence a person reads. I wanted to know whether that
+sentence describes the subgraph the LLM was handed, or just the answer it was told.
 
-Headline: 3,965 of 3,965 cited node ids were real across four of five models,
-while two of those models name the correct structure at chance. Citation
-validity and description accuracy are separate properties, and the standard
-attribution metric only tests the first.
+In this run, 3,965 of 3,965 cited node ids were real across four of five models.
+Yet two of those models name the correct structure only at chance. So citation
+validity and description accuracy are separate things, and the usual
+attribution metric only checks the first one.
 
-This run overturns two claims the previous version of this README made. Both
-are corrected below, with the instrument bugs that produced them.
+This run also overturns two claims I made in the previous version of this
+README. I correct both below and show the instrument bugs that caused them.
 
 ---
 
 ## Abstract
 
 When an LLM narrates a GNN explanation, does the text describe the subgraph it
-was handed, or paraphrase the label it was told? This work separates those by
-construction: narrations are elicited over subgraphs that are either the model's
-real explanation or a decoy, with a label that is either the model's prediction
-or its opposite, and the resulting text is scored for structure agreement and
-label agreement independently.
+was given, or does it paraphrase the label it was told? I set the experiment up
+so the two can be told apart. Each narration is produced over either the
+model's real explanation subgraph or a decoy. The label in the prompt is either
+the model's prediction or its opposite. Then I score the text for structure
+agreement and label agreement separately.
 
-The answer turns out to be a capability question before it is an explainability
-one. Across six narrator configurations, edge-reading accuracy ranges from 0.50,
-chance, for Llama-3.3-70B to 0.90 for GPT-OSS-20B. Llama-3.1-8B is no better: 0.55,
-with an interval that still contains 0.5. Its label sensitivity is exactly 0.000,
-over 200 flipped pairs the narration never changed when the label changed. It
-follows neither the structure nor the label. It produces boilerplate that agrees
-with the label about half the time.
+It turned out to be a question about capability first and explainability
+second. I tried six narrator configurations. Across them, edge-reading accuracy
+ranges from 0.50, chance, for Llama-3.3-70B to 0.90 for GPT-OSS-20B.
+Llama-3.1-8B is no better at 0.55, and its interval still contains 0.5. Its
+label sensitivity is exactly 0.000. That means over 200 flipped pairs the
+narration never changed when the label changed. So it follows neither the
+structure nor the label. It writes boilerplate that agrees with the label about
+half the time.
 
-Citation validity is the cautionary result. It never drops below 0.987 and sits
-at exactly 1.000 in 20 of 24 cells, while structure agreement over the same
-narrations spans 0.450 to 0.891. A metric pinned near its ceiling regardless of
-whether the description is correct cannot be used as evidence of faithfulness,
-which is precisely how citation checks are often reported.
+Citation validity is the warning sign. It never drops below 0.987 and sits at
+exactly 1.000 in 20 of 24 cells. Meanwhile, structure agreement over the same
+narrations spans 0.450 to 0.891. A metric that stays near its ceiling whether
+or not the description is right can't count as evidence of faithfulness. That's
+exactly how citation checks often get reported.
 
-Contributions. (i) A decoy-subgraph and flipped-label design that separates
-structure-following from label-following. (ii) A competence control showing
-whether a narrator can read the graph at all, which turns out to determine
-everything downstream. (iii) Evidence that citation validity is uninformative
-about narration faithfulness. (iv) Seven instrument bugs found and documented
-before any result was reported.
+What I think this adds. First, a decoy-subgraph and flipped-label design that
+pulls structure-following apart from label-following. Second, a competence
+control that checks whether a narrator can read the graph at all. That ended up
+deciding everything downstream. Third, evidence that citation validity tells
+you nothing about narration faithfulness. Last, seven instrument bugs that I
+found and documented before reporting any result.
 
 ---
 
 ## 1. The design
 
-Synthetic graphs with planted `house` and `cycle` motifs, so the causally
-relevant subgraph for every node is known exactly. A GCN reaches 94.3% test
-accuracy on structure alone, node features are pure noise, so it cannot be
-reading anything else.
+I use synthetic graphs with planted `house` and `cycle` motifs, so I know
+exactly which subgraph matters causally for every node. A GCN reaches 94.3%
+test accuracy on structure alone. The node features are pure noise, so there's
+nothing else it could be reading.
 
-For each node, a 2×2:
+Each node gets a 2×2 design.
 
 | | true label | flipped label |
 |---|---|---|
 | **true subgraph** | the normal case | label contradicts structure |
 | **decoy subgraph** | structure swapped | both swapped |
 
-The decoy is a *real* explanation subgraph from a randomly drawn node of the
-other motif class, a genuine alternative structure. The model is
-asked to commit to a motif name and a list of supporting node ids, both
-checkable against the edges it was given, so nothing is scored by a second LLM.
-A judge would reproduce the exact failure under study: one fluent model agreeing
-with another.
+The decoy is a *real* explanation subgraph, taken from a randomly drawn node of
+the other motif class, so it's a genuine alternative structure. I ask the model
+to commit to a motif name and a list of supporting node ids. Both can be
+checked against the edges it was given, so no second LLM does any scoring. A
+judge model would just repeat the failure I'm studying, one fluent model
+agreeing with another.
 
-Two things were added to the 2×2 for this run:
+For this run I added two things to the 2×2.
 
-A control. The same subgraph, no predicted class in the prompt at all,
-same closed answer set. "The model falls back on the label when it cannot read
-the evidence" is only a measurement once *cannot read* has a number.
+The first is a control. It uses the same subgraph and the same closed answer
+set, with no predicted class in the prompt at all. "The model falls back on the
+label when it cannot read the evidence" only becomes a measurement once
+*cannot read* has a number.
 
-A second explainer. Gradient edge saliency alongside GNNExplainer, because
-the subgraph is an input to the narration.
+The second is another explainer. I run gradient edge saliency next to
+GNNExplainer, because the subgraph is an input to the narration too.
 
-The class names shown to the model are `motif-A` /`motif-B`. Nothing in the
-prompt reveals which shape belongs to which class.
+The model only sees the class names `motif-A` /`motif-B`, and nothing in the
+prompt says which shape goes with which class.
 
 ---
 
 ## 2. Results
-Label sensitivity of exactly 0.000 is the sharpest number here. Over 200 flipped
-pairs llama-3.1-8b never changed its answer when the label changed, so it is not
-following the label either; it produces boilerplate that agrees with the label
-about half the time. The run behind these numbers is 1,276 narrations plus 319
-control probes, and every proportion carries a 95% Wilson interval, because
-several gaps the previous version reported do not survive them. Every published
-proportion and interval is recomputed from the per-narration records by the
-implementations in `verify/`, which share no code with the analysis, and CI
-fails if any of them disagrees.
+The sharpest number here is a label sensitivity of exactly 0.000. Over 200
+flipped pairs, llama-3.1-8b never changed its answer when the label changed. So
+it isn't following the label either. It writes boilerplate that agrees with the
+label about half the time. The run behind these numbers is 1,276 narrations plus
+319 control probes. Every proportion has a 95% Wilson interval, because several
+gaps I reported in the previous version don't survive them. The implementations
+in `verify/` recompute every published proportion and interval from the
+per-narration records. They share no code with the analysis, and CI fails if
+any of them disagrees.
 
 ![can the narrator read the subgraph at all](reports/figures/edge-reading.png)
 
@@ -109,18 +111,18 @@ fails if any of them disagrees.
 Full detail in [notes/METHODS.md](notes/METHODS.md#2-results).
 ### The 2×2, GNNExplainer
 
-Two of the four cells carry information, the ones where the structure and the
-label point at different answers. There gpt-oss-20b keeps describing the
-subgraph it was shown: 0.833 [0.664,0.927] structure agreement on a decoy
-against 0.000 [0.000,0.114] label agreement. llama-3.1-8b never leaves the
-0.450 to 0.550 band in any of the four cells. llama-3.3-70b scores 0.783 and
-0.891 where structure and label agree and 0.500 and 0.457 where they conflict,
-which is chance.
+Only two of the four cells carry information. Those are the ones where the
+structure and the label point at different answers. In them gpt-oss-20b keeps
+describing the subgraph it was shown. On a decoy it gets 0.833 [0.664,0.927]
+structure agreement against 0.000 [0.000,0.114] label agreement. llama-3.1-8b
+stays inside the 0.450 to 0.550 band in all four cells. llama-3.3-70b scores
+0.783 and 0.891 where structure and label agree. Where they conflict it gets
+0.500 and 0.457, which is chance.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#the-22-gnnexplainer).
 ### The control: can the model read the edge list at all?
 
-Same subgraphs, no predicted class in the prompt.
+Same subgraphs as before, but with no predicted class in the prompt.
 
 | model | n | edge-reading accuracy |
 |---|---|---|
@@ -130,7 +132,7 @@ Same subgraphs, no predicted class in the prompt.
 | llama-3.1-8b | 100 | 0.550 [0.452,0.644] |
 | llama-3.3-70b | 46 | 0.500 [0.361,0.639] |
 
-Chance is 0.5. **Two of the five models cannot read a six-node edge list**, and
+Chance is 0.5. Two of the five models can't read a six-node edge list, and
 their intervals contain 0.5.
 
 ---
@@ -140,35 +142,39 @@ their intervals contain 0.5.
 ### 2.1 Citation validity is near-perfect and still means almost nothing
 
 Across 3,965 cited node ids from llama-3.1-8b, llama-3.3-70b, gpt-oss-20b and
-gpt-oss-120b, **every single one appeared in the edges the model was shown**.
-Zero fabrication. On the measure ported from
+gpt-oss-120b, every one appeared in the edges the model was shown. Nothing was
+made up. I ported this measure from
 [Wallat et al.'s RAG attribution work](https://arxiv.org/abs/2412.18004), where
-up to 57% of citations were post-rationalised, this pipeline scores flawlessly.
+up to 57% of citations were post-rationalised. On it, this pipeline scores
+perfectly.
 
-Meanwhile llama-3.3-70b names the correct shape 50.0% of the time with no label
-to lean on, chance, for a binary choice, while citing exclusively real nodes.
-**A pipeline can pass a citation-faithfulness audit and hand an investigator a
-false account of the structure.** That is the finding, and more data strengthened
-it.
+But with no label to lean on, llama-3.3-70b names the correct shape 50.0% of
+the time. For a binary choice that's chance, and it still only cites real
+nodes. So a pipeline can pass a citation-faithfulness audit and still give an
+investigator a false account of the structure. That's the main finding, and the
+extra data made it stronger.
 
-One correction: citation validity is *not* 1.000 everywhere, as previously
-reported. qwen3.6-27b fabricated 8 node ids out of 919 (0.991 [0.983,0.996]),
-across 8 of its 204 narrations. Small, real, and only visible at this n.
+I need to correct one thing. Citation validity is *not* 1.000 everywhere, as I
+reported before. qwen3.6-27b fabricated 8 node ids out of 919 (0.991 [0.983,0.996]),
+across 8 of its 204 narrations. It's small, but it's real, and it only shows up
+at this n.
 
 ### 2.2 The competence-floor reading does not survive
 
-The previous version proposed that the label is what a model falls back on when
-it cannot read the evidence, post-rationalisation as a competence floor, not deception. Measured directly, it fails.
+In the previous version I proposed that a model falls back on the label when it
+can't read the evidence. I called it post-rationalisation as a competence
+floor, and I didn't read it as deception. When I measured it directly, it
+didn't hold up.
 
-The measure it rested on was label agreement in the decisive cell. That measure
-cannot support the claim, because **a model that never answers "neither" has
-label agreement identically equal to 1 − structure agreement there.** It is
-structure agreement read backwards. A model guessing at chance scores 0.5 on
-"post-rationalisation" without ever having consulted the label.
+That idea rested on label agreement in the decisive cell, and that measure
+can't support it. In that cell, a model that never answers "neither" has label
+agreement identically equal to 1 − structure agreement. It's just structure
+agreement read backwards. A model guessing at chance scores 0.5 on
+"post-rationalisation" without ever looking at the label.
 
-The measure that can see the label being used is a within-node contrast: same
-node, same edges, temperature 0, and the prompt differs in one word. Does the
-answer move?
+To see whether the label actually gets used, I need a within-node contrast.
+Same node, same edges, temperature 0, and the prompt differs by one word. Then
+I check whether the answer moves.
 
 | model | edge reading | label agr. (naive) | **label sensitivity** | n pairs |
 |---|---|---|---|---|
@@ -178,26 +184,28 @@ answer move?
 | llama-3.1-8b | 0.550 | 0.550 | **0.000 [0.000,0.019]** | 200 |
 | llama-3.3-70b | 0.500 | 0.500 | **0.391 [0.298,0.493]** | 92 |
 
-Against edge-reading ability, the naive measure correlates at **r = −0.924**
-(exact permutation p = 0.058, n=5 models), a textbook competence floor. The
-within-node measure correlates at **r = +0.004** (p = 0.992). Nothing.
+Against edge-reading ability, the naive measure correlates at r = −0.924
+(exact permutation p = 0.058, n=5 models). That looks like a textbook
+competence floor. The within-node measure correlates at r = +0.004
+(p = 0.992), which is nothing.
 
-The two models that cannot read the edge list behave in **opposite** ways.
-llama-3.1-8b never once changed its answer when the label changed, 0 of 200
-pairs, so its apparent 0.550 "label agreement" is an artefact of guessing, not
-post-rationalisation. llama-3.3-70b, equally unable to read, is the most
-label-sensitive model in the set at 0.391.
+The two models that can't read the edge list behave in opposite ways.
+llama-3.1-8b never once changed its answer when the label changed (0 of 200
+pairs). Its apparent 0.550 "label agreement" comes from guessing. It isn't
+post-rationalisation. llama-3.3-70b can't read the list either, yet it's the
+most label-sensitive model in the set at 0.391.
 
-Inability to read the evidence does not predict falling back on the label. It
-predicts *nothing*; what the model does instead is a separate property.
+So not being able to read the evidence doesn't predict falling back on the
+label. It predicts *nothing*. What the model does instead is a separate
+property.
 
 ![label sensitivity against edge-reading ability](reports/figures/competence-vs-label.png)
 
 ![structure agreement across the decoy and flipped-label conditions](reports/figures/counterfactual.png)
 
 ### 2.3 What a conflicting label actually does to a competent reader
-It does not flip them. It makes them hedge. Share of replies answering
-`neither`:
+It doesn't flip them. It makes them hedge. Here's the share of replies
+answering `neither`.
 
 | model | control (no label) | label present |
 |---|---|---|
@@ -207,28 +215,33 @@ It does not flip them. It makes them hedge. Share of replies answering
 | llama-3.1-8b | 0.000 | 0.000 |
 | llama-3.3-70b | 0.000 | 0.000 to 0.022 |
 
-gpt-oss-20b reads these subgraphs at 0.900 unprompted, and its structure agreement falls to 0.767 to 0.833 once a label is in the prompt, the loss goes to `neither`, not to the label (0.000 to 0.100).
+Unprompted, gpt-oss-20b reads these subgraphs at 0.900. Once a label is in the
+prompt, its structure agreement falls to 0.767 to 0.833. What it loses goes to
+`neither`. Very little goes to the label (0.000 to 0.100).
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#23-what-a-conflicting-label-actually-does-to-a-competent-reader).
 ### 2.4 The explainer contrast is inconclusive, and the reason is measurable
-Only llama-3.1-8b completed both explainer arms before the token budget ran out,
-and its two arms are indistinguishable: edge reading 0.550 [0.452,0.644] on
-GNNExplainer subgraphs against 0.540 [0.404,0.670] on saliency subgraphs, label
-sensitivity 0.000 on both. There is barely a contrast to detect. On the 50 nodes
-that arm covers the two explainers return the same edge set for 30 of them, and
-both recover nearly all of the planted motif, 0.987 of its edges for
-GNNExplainer and 0.960 for saliency. That is a limitation of the arm.
+Only llama-3.1-8b finished both explainer arms before the token budget ran out.
+Its two arms look the same. Edge reading is 0.550 [0.452,0.644] on GNNExplainer
+subgraphs and 0.540 [0.404,0.670] on saliency subgraphs. Label sensitivity is
+0.000 on both. There's barely a contrast to detect anyway. The arm covers 50
+nodes, and for 30 of them the two explainers return the same edge set. Both
+recover nearly all of the planted motif, 0.987 of its edges for GNNExplainer
+and 0.960 for saliency. That's a limitation of the arm.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#24-the-explainer-contrast-is-inconclusive-and-the-reason-is-measurable).
 ## 3. Seven instrument bugs, found before any result was reported
-Each would have produced a confident, entirely fake number. The costly one: the
-decoy was always the first eligible node of the other class, so 96 decoy
-narrations rested on 2 distinct stimuli, and the published "llama-3.3-70b tracks
-structure at 0.833" was one model's reaction to one subgraph replicated 48
-times; drawn per node instead, that model sits at 0.500, chance. Two more of the
-seven: the harness showed the model edges the graph does not have, 85 of 120
-saliency edges, and a regex that could not match `**MOTIF:** cycle` silently
-discarded 35 to 50% of three models' replies. Parse failures are now 0.9%.
+Each of these would have given me a confident number that was completely fake.
+The most expensive one was the decoy. It was always the first eligible node of
+the other class. That meant 96 decoy narrations rested on just 2 distinct
+stimuli. The published "llama-3.3-70b tracks structure at 0.833" was really one
+model reacting to one subgraph, repeated 48 times. Once I drew the decoy per
+node, that model sits at 0.500, which is chance.
+
+Two more of the seven are worth naming. The harness showed the model edges the
+graph doesn't have, 85 of 120 saliency edges. And a regex that couldn't match
+`**MOTIF:** cycle` silently threw away 35 to 50% of three models' replies.
+Parse failures are now 0.9%.
 
 Full detail in [notes/METHODS.md](notes/METHODS.md#3-seven-instrument-bugs-found-before-any-result-was-reported).
 ## 4. Running it
@@ -237,50 +250,53 @@ Full detail in [notes/METHODS.md](notes/METHODS.md#3-seven-instrument-bugs-found
 make setup && make test
 ```
 
-18 tests, all on the generator, the split, the parser, the explainers and the interval maths, the instrument. Six of them encode bugs that
-actually shipped.
+There are 18 tests, and they all target the instrument. That means the
+generator, the split, the parser, the explainers and the interval maths. Six of
+them encode bugs that actually shipped.
 
 ```bash
 export GROQ_API_KEY=...
 make counterfactual
 ```
 
-The run checkpoints to `reports/runs.jsonl` and resumes, because the free-tier
-daily token budget makes several sittings a certainty. Unparsed replies are retried, never banked. Subgraphs are cached, so a restart skips the seven
-minutes of GNNExplainer optimisation.
+The run checkpoints to `reports/runs.jsonl` and can resume. With the free
+tier's daily token budget, you'll need several sittings. Unparsed replies get
+retried and are never banked. Subgraphs are cached, so a restart skips the
+seven minutes of GNNExplainer optimisation.
 
-GCN and GNNExplainer are written against dense adjacency with no torch-geometric: 740-node graphs make dense fast, and it removes the dependency
-most likely to stop this running on someone else's machine.
+I wrote GCN and GNNExplainer against dense adjacency, without torch-geometric.
+With 740-node graphs, dense is fast. It also drops the dependency most likely
+to stop this running on someone else's machine.
 
 ## 5. Limitations
 
-- **Unequal and small n for four of five models**: 30 to 51 nodes per cell
+- Unequal and small n for four of five models. Cells have 30 to 51 nodes
   against a planned 100, because the free tier's daily token budget ran out
   mid-run. llama-3.1-8b reached the full 100. Every interval reflects its own n,
-  and nothing below 30 complete nodes is reported at all. Rerunning across two
-  days would close this; a paid tier would close it in an hour.
-- **The explainer arm completed for one model only**, and the two explainers
-  agree on 87% of edges anyway, so the question is barely tested.
-- **n=5 models** is too few for the correlation to carry weight either way. The
-  competence-floor claim is refuted by the within-node measure showing no
-  relationship *and* by two same-ability models behaving oppositely.
-- **Synthetic graphs only.** Exact ground truth is the point, and a real
+  and I don't report anything below 30 complete nodes at all. Rerunning across
+  two days would fix this. A paid tier would fix it in an hour.
+- The explainer arm only finished for one model. The two explainers also agree
+  on 87% of edges, so the question is barely tested.
+- n=5 models is too few for the correlation to carry weight either way. I
+  refute the competence-floor claim with the within-node measure showing no
+  relationship *and* with two models of the same ability behaving in opposite
+  ways.
+- Synthetic graphs only. Exact ground truth is the point here, and a real
   citation network has no ground-truth "reason" to check against.
-- **Two motif classes**, so chance is 0.5 and the metric is coarse.
-- **One provider.** All five models are served by Groq; serving-stack effects
-  are not separable from model effects.
-- **Not measured: whether the hedging in §3 is calibrated.** `neither` may be
-  the right answer for some extracted subgraphs. Nothing here distinguishes
-  well-placed caution from noise.
+- Two motif classes, so chance is 0.5 and the metric is coarse.
+- One provider. Groq serves all five models, so I can't separate serving-stack
+  effects from model effects.
+- I didn't measure whether the hedging in §3 is calibrated. `neither` might be
+  the right answer for some extracted subgraphs. Nothing here tells well-placed
+  caution apart from noise.
 
 ## 6. Licence
 
-Code here is MIT; the terms are in [LICENSE](LICENSE).
+The code is MIT licensed. The terms are in [LICENSE](LICENSE).
 
 ## References
 
-One paper per component: the explainer, the classifier it explains, and the
-definition of faithfulness the whole measurement is written against.
+I cite one paper for each component.
 
 - **Ying, Bourgeois, You, Zitnik, Leskovec. GNNExplainer: Generating Explanations for Graph Neural Networks. NeurIPS 2019.** [arXiv:1903.03894](https://arxiv.org/abs/1903.03894) the explanation the narration is checked against.
 - **Kipf, Welling. Semi-Supervised Classification with Graph Convolutional Networks. ICLR 2017.** [arXiv:1609.02907](https://arxiv.org/abs/1609.02907) the GCN being explained.
