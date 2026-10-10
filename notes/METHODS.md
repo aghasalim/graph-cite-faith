@@ -23,7 +23,7 @@ over 200 flipped pairs the narration never changed when the label changed. It
 follows neither the structure nor the label. It produces boilerplate that agrees
 with the label about half the time.
 
-Citation validity is the cautionary result. It never drops below 0.987 and sits
+Citation validity is the cautionary result. It never drops below 0.941 and sits
 at exactly 1.000 in 20 of 24 cells, while structure agreement over the same
 narrations spans 0.450 to 0.891. A metric pinned near its ceiling regardless of
 whether the description is correct cannot be used as evidence of faithfulness,
@@ -106,8 +106,9 @@ false account of the structure.** That is the finding, and more data strengthene
 it.
 
 One correction: citation validity is *not* 1.000 everywhere, as previously
-reported. qwen3.6-27b fabricated 8 node ids out of 919 (0.991 [0.983,0.996]),
-across 8 of its 204 narrations. Small, real, and only visible at this n.
+reported. qwen3.6-27b fabricated 8 node ids out of 919, across 8 of its 204
+narrations (0.960 [0.924,0.980] cited only real ids). Small, real, and only visible
+at this n.
 
 ### 2.2 The competence-floor reading does not survive
 
@@ -302,28 +303,28 @@ whatever n it reached.
 ### The 2×2, GNNExplainer
 
 
-| model | n/cell | subgraph | label | structure agr. | label agr. | citation validity |
+| model | n/cell | subgraph | label | structure agr. | label agr. | citation validity (per reply) |
 |---|---|---|---|---|---|---|
-| **llama-3.1-8b** | 100 | true | true | 0.550 [0.452,0.644] | 0.550 | 1.000 [0.989,1.000] |
-| | | decoy | flipped | 0.450 [0.356,0.548] | 0.450 | 1.000 [0.989,1.000] |
-| | | **decoy** | **true** | **0.450 [0.356,0.548]** | **0.550 [0.452,0.644]** | 1.000 [0.988,1.000] |
-| | | **true** | **flipped** | **0.550 [0.452,0.644]** | **0.450 [0.356,0.548]** | 1.000 [0.990,1.000] |
-| **llama-3.3-70b** | 46 | true | true | 0.783 [0.644,0.877] | 0.783 | 1.000 [0.978,1.000] |
-| | | decoy | flipped | 0.891 [0.770,0.953] | 0.891 | 1.000 [0.981,1.000] |
-| | | **decoy** | **true** | **0.500 [0.361,0.639]** | **0.500 [0.361,0.639]** | 1.000 [0.981,1.000] |
-| | | **true** | **flipped** | **0.457 [0.322,0.598]** | **0.543 [0.402,0.678]** | 1.000 [0.976,1.000] |
-| **qwen3.6-27b** | 51 | true | true | 0.569 [0.433,0.695] | 0.569 | 0.996 [0.976,0.999] |
-| | | decoy | flipped | 0.804 [0.675,0.890] | 0.804 | 0.987 [0.963,0.996] |
-| | | **decoy** | **true** | **0.686 [0.550,0.797]** | **0.118 [0.055,0.234]** | 0.996 [0.976,0.999] |
-| | | **true** | **flipped** | **0.627 [0.490,0.747]** | **0.196 [0.110,0.325]** | 0.987 [0.962,0.996] |
-| **gpt-oss-120b** | 42 | true | true | 0.738 [0.589,0.847] | 0.738 | 1.000 [0.967,1.000] |
-| | | decoy | flipped | 0.738 [0.589,0.847] | 0.738 | 1.000 [0.974,1.000] |
-| | | **decoy** | **true** | **0.619 [0.468,0.750]** | **0.048 [0.013,0.158]** | 1.000 [0.977,1.000] |
-| | | **true** | **flipped** | **0.738 [0.589,0.847]** | **0.048 [0.013,0.158]** | 1.000 [0.973,1.000] |
-| **gpt-oss-20b** | 30 | true | true | 0.833 [0.664,0.927] | 0.833 | 1.000 [0.974,1.000] |
-| | | decoy | flipped | 0.833 [0.664,0.927] | 0.833 | 1.000 [0.970,1.000] |
-| | | **decoy** | **true** | **0.833 [0.664,0.927]** | **0.000 [0.000,0.114]** | 1.000 [0.972,1.000] |
-| | | **true** | **flipped** | **0.767 [0.591,0.882]** | **0.100 [0.035,0.256]** | 1.000 [0.973,1.000] |
+| **llama-3.1-8b** | 100 | true | true | 0.550 [0.452,0.644] | 0.550 | 1.000 [0.963,1.000] |
+|  |  | decoy | flipped | 0.450 [0.356,0.548] | 0.450 | 1.000 [0.963,1.000] |
+|  |  | **decoy** | **true** | **0.450 [0.356,0.548]** | **0.550 [0.452,0.644]** | 1.000 [0.963,1.000] |
+|  |  | **true** | **flipped** | **0.550 [0.452,0.644]** | **0.450 [0.356,0.548]** | 1.000 [0.963,1.000] |
+| **llama-3.3-70b** | 46 | true | true | 0.783 [0.644,0.877] | 0.783 | 1.000 [0.923,1.000] |
+|  |  | decoy | flipped | 0.891 [0.770,0.953] | 0.891 | 1.000 [0.923,1.000] |
+|  |  | **decoy** | **true** | **0.500 [0.361,0.639]** | **0.500 [0.361,0.639]** | 1.000 [0.923,1.000] |
+|  |  | **true** | **flipped** | **0.457 [0.322,0.598]** | **0.543 [0.402,0.678]** | 1.000 [0.923,1.000] |
+| **qwen3.6-27b** | 51 | true | true | 0.569 [0.433,0.695] | 0.569 | 0.980 [0.895,0.996] |
+|  |  | decoy | flipped | 0.804 [0.675,0.890] | 0.804 | 0.941 [0.841,0.980] |
+|  |  | **decoy** | **true** | **0.686 [0.550,0.797]** | **0.118 [0.055,0.234]** | 0.980 [0.895,0.996] |
+|  |  | **true** | **flipped** | **0.627 [0.490,0.747]** | **0.196 [0.110,0.325]** | 0.941 [0.841,0.980] |
+| **gpt-oss-120b** | 42 | true | true | 0.738 [0.589,0.847] | 0.738 | 1.000 [0.916,1.000] |
+|  |  | decoy | flipped | 0.738 [0.589,0.847] | 0.738 | 1.000 [0.916,1.000] |
+|  |  | **decoy** | **true** | **0.619 [0.468,0.750]** | **0.048 [0.013,0.158]** | 1.000 [0.916,1.000] |
+|  |  | **true** | **flipped** | **0.738 [0.589,0.847]** | **0.048 [0.013,0.158]** | 1.000 [0.916,1.000] |
+| **gpt-oss-20b** | 30 | true | true | 0.833 [0.664,0.927] | 0.833 | 1.000 [0.886,1.000] |
+|  |  | decoy | flipped | 0.833 [0.664,0.927] | 0.833 | 1.000 [0.883,1.000] |
+|  |  | **decoy** | **true** | **0.833 [0.664,0.927]** | **0.000 [0.000,0.114]** | 1.000 [0.886,1.000] |
+|  |  | **true** | **flipped** | **0.767 [0.591,0.882]** | **0.100 [0.035,0.256]** | 1.000 [0.886,1.000] |
 
 Only the bold rows carry information. In the other two, structure and label
 point at the same answer, so agreement with one is agreement with the other.

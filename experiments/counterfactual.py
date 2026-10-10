@@ -32,8 +32,8 @@ number wearing two hats, and a model guessing at chance scores 0.5 on
   temperature 0 an indifferent model scores 0 and a pure label-follower scores
   1. This is the measure that can actually see the label being used.
 
-**citation validity** -- the share of cited node ids that appear in the provided
-edges -- ports the RAG-attribution measure (Wallat et al., arXiv 2412.18004) to
+**citation validity** -- the share of replies whose cited node ids all appear in
+the provided edges -- ports the RAG-attribution measure (Wallat et al., arXiv 2412.18004) to
 graphs, where it can be checked exactly rather than by entailment.
 
 **the control** -- the same subgraphs with no predicted class in the prompt at
@@ -331,12 +331,18 @@ def ci(col) -> str:
     return f"{col.mean():.3f} [{lo:.3f},{hi:.3f}]"
 
 
-def pooled_ci(valid, total) -> str:
-    k, n = int(valid.sum()), int(total.sum())
-    if n == 0:
+def reply_ci(valid, total) -> str:
+    """Citation validity per reply: the share of replies that cited only real ids.
+
+    Pooling cited ids and putting a Wilson interval on that share treats every
+    id as an independent trial, but the ids in one reply come from one
+    generation and fail together. The reply is the independent unit, so the
+    interval is over replies. Replies that cite nothing are left out.
+    """
+    cited = total > 0
+    if not cited.any():
         return "n/a"
-    lo, hi = wilson(k, n)
-    return f"{k / n:.3f} [{lo:.3f},{hi:.3f}]"
+    return ci(valid[cited] == total[cited])
 
 
 def report(js: list[dict]) -> None:
@@ -375,6 +381,16 @@ def report(js: list[dict]) -> None:
     unparsed = (~df["parsed"]).sum()
     print(f"{unparsed} replies gave no answer from the closed set "
           f"({unparsed / len(df):.1%})")
+    summarise(df)
+
+
+def summarise(df, write_records: bool = True) -> None:
+    """Write the published tables from the filtered per-reply records.
+
+    Also runs on its own from the committed reports/counterfactual.json, which is
+    exactly this df, so the tables can be rebuilt without the API log.
+    """
+    import pandas as pd
 
     nar = df[df["kind"] == "narrate"]
     main = nar.groupby(["model", "explainer", "subgraph", "label"]).apply(
@@ -382,7 +398,7 @@ def report(js: list[dict]) -> None:
             "n": len(g),
             "structure_agreement": ci(g["agrees_with_structure"]),
             "label_agreement": ci(g["agrees_with_label"].astype(bool)),
-            "citation_validity": pooled_ci(g["cited_valid"], g["n_cited"]),
+            "citation_validity": reply_ci(g["cited_valid"], g["n_cited"]),
         }), include_groups=False)
 
     ctl = df[df["kind"] == "control"].groupby(["model", "explainer"]).apply(
@@ -413,7 +429,8 @@ def report(js: list[dict]) -> None:
                         & (df["explainer"] == e)])]).round(3)
 
     OUT.mkdir(exist_ok=True)
-    df.to_json(OUT / "counterfactual.json", orient="records", indent=2)
+    if write_records:
+        df.to_json(OUT / "counterfactual.json", orient="records", indent=2)
     main.to_csv(OUT / "counterfactual_summary.csv")
     ctl.to_csv(OUT / "edge_reading_control.csv")
     joint.to_csv(OUT / "competence_vs_label.csv", index=False)
@@ -425,6 +442,11 @@ def report(js: list[dict]) -> None:
 
 
 def main() -> None:
+    if "--from-json" in sys.argv:
+        import pandas as pd
+        summarise(pd.read_json(OUT / "counterfactual.json", orient="records"),
+                  write_records=False)
+        return
     ds, chosen, decoy, stim, _ = build_stimuli()
     js = jobs_for(ds, chosen, decoy)
     print(f"{len(js)} conditions x {len(MODELS)} models = {len(js) * len(MODELS)} calls")

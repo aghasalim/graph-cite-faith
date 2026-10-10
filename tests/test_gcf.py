@@ -240,3 +240,18 @@ def test_rate_limit_reset_headers_parse():
     # Nothing the per-minute budget reports should ever exceed a minute.
     for h in ("577ms", "3.885s", "59s", "junk"):
         assert narrate._secs(h) <= 60.0
+
+
+def test_citation_validity_interval_is_over_replies_not_ids():
+    """Ten replies citing ten real ids each is ten trials, not a hundred: the ids in
+    one reply come from one generation. A reply that cites nothing is left out."""
+    import pandas as pd
+
+    valid = pd.Series([10] * 10 + [0])
+    total = pd.Series([10] * 10 + [0])
+    lo, hi = counterfactual.wilson(10, 10)
+    assert counterfactual.reply_ci(valid, total) == f"1.000 [{lo:.3f},{hi:.3f}]"
+    # one bad id makes that whole reply count as invalid
+    valid.iloc[0] = 9
+    lo, hi = counterfactual.wilson(9, 10)
+    assert counterfactual.reply_ci(valid, total) == f"0.900 [{lo:.3f},{hi:.3f}]"

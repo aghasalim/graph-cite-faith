@@ -22,8 +22,8 @@ SELECT json_extract(value, '$.model')                  AS model,
 FROM json_each(readfile('reports/counterfactual.json'));
 
 -- Every published proportion as one long table: which cell, which metric, how
--- many successes out of how many trials. Citation validity pools node ids
--- rather than narrations, which is why its denominator is a different column.
+-- many successes out of how many trials. Citation validity counts replies
+-- that cited only real ids, out of the replies that cited anything.
 CREATE TEMP VIEW stat AS
     SELECT model, explainer, subgraph, label, 'structure' AS metric,
            SUM(agrees_structure) AS k, COUNT(*) AS n
@@ -34,7 +34,7 @@ CREATE TEMP VIEW stat AS
     FROM rec WHERE kind = 'narrate' GROUP BY 1, 2, 3, 4
     UNION ALL
     SELECT model, explainer, subgraph, label, 'citation',
-           SUM(cited_valid), SUM(n_cited)
+           SUM(n_cited > 0 AND cited_valid = n_cited), SUM(n_cited > 0)
     FROM rec WHERE kind = 'narrate' GROUP BY 1, 2, 3, 4
     UNION ALL
     SELECT model, explainer, '', '', 'control',
