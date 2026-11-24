@@ -1,5 +1,3 @@
-<p align="center"><img src="assets/banner.jpg" alt="Line drawing of a small graph with quotation tags on its nodes, one of them pointing to the wrong node" width="100%"></p>
-
 # GraphCiteFaith, perfect citations, wrong explanation
 
 [![ci](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml/badge.svg)](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml)
