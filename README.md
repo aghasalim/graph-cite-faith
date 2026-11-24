@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner.jpg" alt="Line drawing of a small graph with quotation tags on its nodes, one of them pointing to the wrong node" width="100%"></p>
+
 # GraphCiteFaith, perfect citations, wrong explanation
 
 [![ci](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml/badge.svg)](https://github.com/aghasalim/graph-cite-faith/actions/workflows/ci.yml)
@@ -18,6 +20,20 @@ This run also overturns two claims I made in the previous version of this
 README. I correct both below and show the instrument bugs that caused them.
 
 ---
+
+<details>
+<summary>Contents</summary>
+
+- [Abstract](#abstract)
+- [1. The design](#1-the-design)
+- [2. Results](#2-results)
+- [3. Seven instrument bugs, found before any result was reported](#3-seven-instrument-bugs-found-before-any-result-was-reported)
+- [4. Running it](#4-running-it)
+- [5. Limitations](#5-limitations)
+- [6. Licence](#6-licence)
+- [References](#references)
+
+</details>
 
 ## Abstract
 
